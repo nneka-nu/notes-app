@@ -1,0 +1,220 @@
+button, input, select, textarea {
+  font-family : inherit;
+  font-size   : 100%;
+}
+
+main {
+  border: 1px solid rgb(222, 222, 222);
+  border-radius: 8px;
+  max-width: 800px;
+  margin: 30px auto;
+}
+
+.toolbar {
+  background: rgb(178,178,178);
+  background: linear-gradient(0deg, rgba(205,205,205,1) 0%, rgba(229,229,229,1) 100%);
+  border: 1px solid rgb(222, 222, 222);
+  border-left: none;
+  border-right: none;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  height: 38px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+input[type=search] {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  color: rgb(126, 126, 126);
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 4px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-right: 6px;
+  width: 180px;
+}
+
+.content {
+  display: flex;
+  border-radius: inherit;
+  height: 300px;
+}
+
+.folders, .notes-list, .single-note {
+  overflow: scroll;
+}
+
+.folders {
+  background: rgb(246, 246, 246);
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgb(119, 119, 119);
+  border-top: 1px solid rgb(222, 222, 222);
+  border-bottom-left-radius: inherit;
+  width: 20%;
+  transition: width 0.35s;
+}
+
+.folders.active {
+  width: 0;
+}
+
+.folders-header {
+  font-size: 0.75rem;
+  padding-left: 6px;
+}
+
+.folders-list {
+  flex: 1 0 auto;
+  padding: 6px 16px;
+}
+
+.folders-footer {
+  margin-bottom: 10px;
+  padding-left: 5px;
+}
+
+.folders-footer .new button {
+  background: none;
+  border: none;
+  outline: none;
+  color: rgb(119, 119, 119);
+  display: flex;
+}
+
+.folders-footer .new button:active {
+  color: rgba(119, 119, 119, 0.2);
+}
+
+.folders-footer button:active .icon-plus {
+  color: rgba(119, 119, 119, 0.2) !important;
+}
+
+.folders-footer .new .text {
+  margin-left: 5px;
+}
+
+.notes-list {
+  background: rgb(251, 251, 251);
+  border: 1px solid rgb(222, 222, 222);
+  border-bottom: none;
+  cursor: default;
+  width: 25%;
+}
+
+.notes-list.folders-hidden {
+  border-bottom-left-radius: inherit;
+  border-left: none;
+}
+.notes-list, .single-note {
+  font-size: 0.9rem;
+}
+
+.notes-list .title {
+  font-weight: bold;
+}
+
+.notes-list .subtitle {
+  font-size: 0.8rem;
+  color: rgb(126, 126, 126);
+}
+
+.notes-list .last-updated {
+  color: black;
+}
+
+.notes-list ul {
+  list-style-type: none;
+  margin: 0 0 0 20px;
+  padding: 0;
+}
+
+.notes-list ul li {
+  margin: 0;
+  padding: 10px 10px 10px 0;
+  border-bottom: 1px solid rgb(222, 222, 222);
+}
+
+.single-note {
+  flex: 2;
+  background: rgb(253, 253, 253);
+  border-top: 1px solid rgb(222, 222, 222);
+  border-bottom-right-radius: inherit;
+}
+
+.single-note .datetime {
+  text-align: center;
+  padding-top: 12px;
+  color: rgb(150, 150, 150);
+}
+
+/* QUILL CSS */
+.ql-toolbar {
+  display: flex;
+}
+
+.ql-toolbar .size-label {
+  align-self: center;
+  margin-right: 4px;
+}
+
+.ql-toolbar .trash-icon {
+  align-self: center;
+  margin-right: 198px;
+}
+
+.ql-toolbar button {
+  border: 1px solid rgb(209, 209, 209);
+  background: #fafafa;
+  height: 24px;
+  border-radius: 4px;
+  margin-right: 5px;
+  width: 38px;
+}
+
+.ql-toolbar button[value=bullet],
+.ql-toolbar button[value=ordered],
+.ql-toolbar .trash-icon,
+.ql-toolbar .columns-icon {
+  position: relative;
+}
+
+.ql-toolbar button[value=bullet] svg,
+.ql-toolbar button[value=ordered] svg,
+.ql-toolbar .trash-icon svg,
+.ql-toolbar .columns-icon svg {
+  position: absolute;
+  top: 3px;
+  left: 10px;
+}
+
+.ql-toolbar button:active{
+    color: dodgerblue;
+}
+
+.ql-editor {
+  padding: 8px 26px;
+  color: rgb(77, 77, 77);
+}
+
+.ql-editor.ql-blank::before {
+  font-style: normal;
+  left: 26px;
+}
+
+.ql-editor ol, .ql-editor ul {
+  padding-left: 4px;
+}
+
+.ql-container {
+  font-family: inherit;
+  font-size: 0.92rem;
+}
