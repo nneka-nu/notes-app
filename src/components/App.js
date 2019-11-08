@@ -6,12 +6,6 @@ import FoldersList from './FoldersList';
 import NotesList from './NotesList';
 import SingleNote from './SingleNote';
 
-const notesList = [
-  {id: 1, title: 'WEB DEV TO...', folder: 'Notes', lastUpdated: '11:02 AM', note: 'Study Java...'},
-  {id: 2, title: 'Note this', folder: 'Notes', lastUpdated: '11:02 AM', note: 'Practice redux'},
-  {id: 3, title: 'Daily do', folder: 'Notes', lastUpdated: 'Thursday', note: 'WHAT to do...'}
-];
-
 const App = () => {
   console.log('App render');
   const [toggleFolder, setToggleFolder] = useState(true);
@@ -38,7 +32,7 @@ const App = () => {
       </header>
       <section className="content">
         <FoldersList toggleFolder={toggleFolder} />
-        <NotesList notes={notesList} toggleFolder={toggleFolder} />
+        <NotesList toggleFolder={toggleFolder} />
         {toolbarRefHasValue && 
           <SingleNote 
             toolbarRef={toolbarRef.current}

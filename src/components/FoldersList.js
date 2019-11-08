@@ -1,13 +1,18 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { AiFillPlusCircle } from 'react-icons/ai';
 import { IconContext } from 'react-icons';
 
-const FoldersList = ({ toggleFolder }) => {
+const FoldersList = ({ folders, toggleFolder }) => {
   return (
     <section className={'folders ' + (toggleFolder ? '' : 'active')}>
       <div className="folders-header">Folders</div>
       <div className="folders-list">
-        Folders List...
+        <ul>
+          {folders.map(folder => (
+            <li key={folder.id}>{folder.name}</li>
+          ))}
+        </ul>
       </div>
       <div className="folders-footer">
         <div className="new">
@@ -24,4 +29,8 @@ const FoldersList = ({ toggleFolder }) => {
   )
 };
 
-export default FoldersList;
+const mapStateToProps = (state) => ({
+  folders: state.folders,
+});
+
+export default connect(mapStateToProps, null)(FoldersList);

@@ -14,6 +14,8 @@ import {
   updateNote,
   deleteNote,
 } from './notes';
+import { SET_SELECTED_FOLDER_ID, setSelectedFolderId } from './selectedFolderId';
+import { SET_SELECTED_NOTE, setSelectedNote } from './selectedNote';
 
 export const types = { 
   ADD_FOLDER, 
@@ -22,6 +24,8 @@ export const types = {
   ADD_NOTE,
   UPDATE_NOTE,
   DELETE_NOTE,
+  SET_SELECTED_FOLDER_ID,
+  SET_SELECTED_NOTE,
 }
 
 export const actions = { 
@@ -31,4 +35,6 @@ export const actions = {
   addNote,
   updateNote,
   deleteNote,
+  setSelectedFolderId,
+  setSelectedNote,
 }
