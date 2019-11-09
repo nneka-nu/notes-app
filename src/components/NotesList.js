@@ -3,7 +3,7 @@ import { connect } from'react-redux';
 import moment from 'moment';
 import { actions } from '../actions';
 import { getNotesByFolder } from '../selectors';
-import { editorIsBlank } from '../utils';
+import { isNoteEmpty } from '../utils';
 
 const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabled, deleteNote, toggleFolder }) => {
   console.log('NotesList render');
@@ -17,14 +17,13 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
     const currentSelectedNote = notes[currentSelectedNoteIndex];
     let emptyNote = true;
 
-    if (currentSelectedNote.note !== '') {
-      const quillOps = JSON.parse(currentSelectedNote.note).ops;
-      emptyNote = editorIsBlank(quillOps);
+    if (currentSelectedNote.noteAsText !== '') {
+      emptyNote = isNoteEmpty(currentSelectedNote.noteAsText);
     }
 
-    // User selected another note after creating new blank note
-    // or after deleting contents of an old note.
-    // Delete blank note.
+    /* User selected another note after creating a new blank note 
+      or after deleting contents of an old note.
+      Delete blank note. */
     if (emptyNote) {
       setCreateButtonDisabled(false);
       deleteNote(selectedNote.id);
@@ -36,7 +35,7 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
       }
       setSelectedNote({
         id: note.id,
-        note: note.note,
+        note: note.noteAsDelta,
         index: newIndex,
         className: 'selected'
       });
@@ -46,7 +45,7 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
     // all notes have a value
     setSelectedNote({
       id: note.id,
-      note: note.note,
+      note: note.noteAsDelta,
       index,
       className: 'selected'
     });
@@ -57,8 +56,22 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
       <ul>
       {notes.map((note, index) => {
         let dateOrTime = '';
-        let title = note.note ? 'note has value' : 'New note'
-        let subtitle = note.note ? 'note has subtitle': 'No additional text'
+        let emptyNote = isNoteEmpty(note.noteAsText);
+        let firstLine = '';
+        let secondLine = '';
+        if (!emptyNote) {
+          let noteArray = note.noteAsText.split(/[\n\t\r]/g);
+          let filtered = noteArray.filter(item => item !== '');
+          
+          if (filtered.length >= 2) {
+            [firstLine, secondLine] = filtered;
+          } else {
+            firstLine = filtered[0];
+          }
+        }
+
+        let title = emptyNote ?  'New note' : firstLine;
+        let subtitle = !emptyNote && secondLine ? secondLine : 'No additional text';
         let nowMoment = moment();
         let lastUpdatedMoment = moment(note.lastUpdated);
         let differenceInDays = nowMoment.diff(lastUpdatedMoment, 'days');

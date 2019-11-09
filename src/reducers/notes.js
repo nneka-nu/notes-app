@@ -14,7 +14,8 @@ const notes = (state = [], action) => {
           return {
             ...note, 
             ...{
-              note: action.note,
+              noteAsDelta: action.noteAsDelta,
+              noteAsText: action.noteAsText,
               lastUpdated: action.lastUpdated
             }
           }

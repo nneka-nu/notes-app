@@ -3,7 +3,7 @@ import Quill from 'quill';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { actions } from '../actions';
-import { editorIsBlank } from '../utils';
+import { isNoteEmpty } from '../utils';
 
 const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, toolbarRef }) => {
   console.log('SingleNote render', note);
@@ -19,7 +19,6 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, tool
   }, [dateTime, note.lastUpdated]);
 
   useEffect(() => {
-    Quill.debug('error');
     quillInstance.current = new Quill(editorRef.current, {
       modules: {
         toolbar: toolbarRef
@@ -48,25 +47,31 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, tool
     }
     prevNoteIdRef.current = note.id;
 
-    if (note.note) {
-      quillInstance.current.setContents(JSON.parse(note.note));
-    } else {
-      quillInstance.current.setText('\n');
-    }
-
-  }, [note.id, note.note]);
+    if (note.noteAsDelta) {
+      try {
+        quillInstance.current.setContents(note.noteAsDelta);
+      } catch (e) {
+        console.log(e);
+      }
+    } 
+  }, [note.id, note.noteAsDelta]);
 
   useEffect(() => {
-    quillInstance.current.focus();
-    
+    if (note.noteAsText === '') {
+      quillInstance.current.focus();
+    }
+  });
+
+  useEffect(() => {
     const handler = () => {
-      // use selected another note and started typing
+      // user selected another note and started typing
       if (note.id !== firstNote.id) {
         // TODO dispatch(moveSelectedNoteToTop)
       }
 
       const contents = quillInstance.current.getContents();
-      const emptyNote = editorIsBlank(contents.ops);
+      const text = quillInstance.current.getText();
+      const emptyNote = isNoteEmpty(text);
 
       if (emptyNote) {
         setCreateButtonDisabled(true);
@@ -79,8 +84,8 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, tool
       if (currentTime !== previousTime) {
         setDateTime(moment().format('MMMM D, YYYY [at] h:mm A'));
       }
-      console.log('text-change', JSON.stringify(contents));
-      updateNote(note.id, JSON.stringify(contents), moment().format());
+      console.log('text-change', JSON.stringify(quillInstance.current.getText()), JSON.stringify(contents));
+      updateNote(note.id, contents, text, moment().format());
     }
     quillInstance.current.on('text-change', handler);
 

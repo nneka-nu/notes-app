@@ -17,18 +17,24 @@ const Toolbar = forwardRef((props, ref) => {
     createNote } = props;
 
   const handleCreateNote = (e) => {
-    e.currentTarget.blur()
+    e.currentTarget.blur();
     let newNote = {
       id: uuidv1(), 
-      note: '', 
+      noteAsDelta: {
+        "ops": [{"insert":"\n"}]
+      },
+      noteAsText: '',
       folderId: selectedFolderId, 
       lastUpdated: moment().format()
-    }
+    };
     setCreateButtonDisabled(true);
     createNote(newNote);
     setSelectedNote({
       id: newNote.id,
-      note: '',
+      noteAsDelta: {
+        "ops": [{"insert":"\n"}]
+      },
+      noteAsText: '',
       index: 0,
       className: 'default'
     });

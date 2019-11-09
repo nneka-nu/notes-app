@@ -5,16 +5,17 @@ export const CREATE_NOTE = 'CREATE_NOTE';
 export const UPDATE_NOTE = 'UPDATE_NOTE';
 export const DELETE_NOTE = 'DELETE_NOTE';
 
-/* Action Creator */
+/* Action Creators */
 export const createNote = (note) => ({
   type: CREATE_NOTE,
   note
 });
 
-export const updateNote = (id, note, lastUpdated) => ({
+export const updateNote = (id, noteAsDelta, noteAsText, lastUpdated) => ({
   type: UPDATE_NOTE,
   id,
-  note,
+  noteAsDelta,
+  noteAsText,
   lastUpdated
 });
 

@@ -16,7 +16,10 @@ const note1Date = moment().format();
 const notes = [
   {
     id: noteId, 
-    note: '', 
+    noteAsDelta: {
+      "ops": [{"insert":"\n"}]
+    },
+    noteAsText: '',
     folderId, 
     lastUpdated: note1Date
   },

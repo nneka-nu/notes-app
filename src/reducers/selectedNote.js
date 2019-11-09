@@ -1,6 +1,6 @@
 import { types } from '../actions';
 
-const selectedNote = (state = '', action) => {
+const selectedNote = (state = {}, action) => {
   if (action.type === types.SET_SELECTED_NOTE) {
     return action.note;
   }
