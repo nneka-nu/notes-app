@@ -3,15 +3,10 @@ import { types } from '../actions';
 /* [{id, note, folderId, lastUpdated}] */
 const notes = (state = [], action) => {
   switch(action.type) {
-    case types.ADD_NOTE:
+    case types.CREATE_NOTE:
       return [
+        action.note,
         ...state,
-        {
-          id: action.id,
-          note: action.note,
-          folderId: action.folderId,
-          lastUpdated: action.lastUpdated,
-        }
       ];
     case types.UPDATE_NOTE:
       return state.map(note => {

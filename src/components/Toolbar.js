@@ -1,9 +1,38 @@
 import React, { forwardRef } from 'react';
+import uuidv1 from 'uuid/v1';
+import moment from 'moment';
 import { GoListUnordered, GoListOrdered, GoTrashcan } from 'react-icons/go';
-import { FiColumns } from 'react-icons/fi';
+import { FiColumns, FiEdit } from 'react-icons/fi';
+import { connect } from 'react-redux';
+import { actions } from '../actions';
 
 const Toolbar = forwardRef((props, ref) => {
   console.log('Toolbar render')
+  const { 
+    selectedFolderId,
+    createButtonDisabled,
+    setCreateButtonDisabled,
+    setSelectedNote,
+    onToggleFolder,
+    createNote } = props;
+
+  const handleCreateNote = (e) => {
+    e.currentTarget.blur()
+    let newNote = {
+      id: uuidv1(), 
+      note: '', 
+      folderId: selectedFolderId, 
+      lastUpdated: moment().format()
+    }
+    setCreateButtonDisabled(true);
+    createNote(newNote);
+    setSelectedNote({
+      id: newNote.id,
+      note: '',
+      index: 0,
+      className: 'default'
+    });
+  };
 
   return (
     <>
@@ -13,7 +42,7 @@ const Toolbar = forwardRef((props, ref) => {
           title="Show/hide folders"
           onClick={(e) => {
             e.currentTarget.blur();
-            props.onToggleFolder();
+            onToggleFolder();
           }}
         >
           <FiColumns />
@@ -26,6 +55,14 @@ const Toolbar = forwardRef((props, ref) => {
             prompt("Are you sure you want to delete this note?")}}
         >
           <GoTrashcan />
+        </button>
+        <button
+          title="Create note"
+          className="create-icon"
+          disabled={createButtonDisabled}
+          onClick={handleCreateNote}
+        >
+          <FiEdit />
         </button>
         <button className="ql-bold">B</button>
         <button className="ql-italic">I</button>
@@ -46,4 +83,20 @@ const Toolbar = forwardRef((props, ref) => {
   )
 });
 
-export default Toolbar;
+const mapStateToProps = (state) => ({
+  selectedFolderId: state.selectedFolderId,
+  createButtonDisabled: state.createButtonDisabled,
+});
+
+const mapDispatchToProps = {
+  createNote: actions.createNote,
+  setCreateButtonDisabled: actions.setCreateButtonDisabled,
+  setSelectedNote: actions.setSelectedNote,
+};
+
+export default connect(
+  mapStateToProps, 
+  mapDispatchToProps, 
+  null, 
+  { forwardRef: true }
+)(Toolbar);

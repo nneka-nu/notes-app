@@ -108,19 +108,18 @@ input[type=search] {
   border-bottom: none;
   cursor: default;
   width: 25%;
+  font-size: 0.85rem;
 }
 
 .notes-list.folders-hidden {
   border-bottom-left-radius: inherit;
   border-left: none;
 }
-.notes-list {
-  font-size: 0.85rem;
-}
 
 .single-note .datetime {
   font-size: 0.87rem;
 }
+
 .notes-list .title {
   font-weight: bold;
   margin-bottom: 2px;
@@ -142,20 +141,59 @@ input[type=search] {
   margin-right: 8px;
 }
 
-.notes-list ul {
-  list-style-type: none;
-  margin: 0 0 0 25px;
-  padding: 0;
-}
-
 .notes-list ul li {
   margin: 0;
+  padding-left: 25px;
   padding-right: 12px;
-  border-bottom: 1px solid rgb(222, 222, 222);
-  height: 50px;
+  height: 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+}
+
+.notes-list ul li:before {
+  content: "";
+  display: block;
+  border-bottom: 1px solid rgb(222, 222, 222);
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 25px;
+  z-index: 10;
+}
+
+.notes-list ul li:first-child:before {
+  border: none;
+}
+
+.notes-list ul li:last-child:after {
+  content: "";
+  display: block;
+  border-bottom: 1px solid rgb(222, 222, 222);
+  width: 100%;
+  position: absolute;
+  top: 59px;
+  left: 25px;
+  z-index: 10;
+}
+
+.notes-list ul li.default {
+  background: rgba(222, 222, 222, 0.9);
+}
+
+.notes-list ul li.selected {
+  background: rgb(255, 230, 143);;
+}
+
+.notes-list ul li.selected:before,
+.notes-list ul li.selected:after {
+  border-bottom: none;
+}
+
+.notes-list ul li.default + li:before,
+.notes-list ul li.selected + li:before {
+  border: none;
 }
 
 .single-note {
@@ -183,7 +221,10 @@ input[type=search] {
 
 .ql-toolbar .trash-icon {
   align-self: center;
-  margin-right: 198px;
+}
+
+.ql-toolbar .create-icon {
+  margin-right: 176px;
 }
 
 .ql-toolbar button {
@@ -198,20 +239,22 @@ input[type=search] {
 .ql-toolbar button[value=bullet],
 .ql-toolbar button[value=ordered],
 .ql-toolbar .trash-icon,
-.ql-toolbar .columns-icon {
+.ql-toolbar .columns-icon,
+.ql-toolbar .create-icon {
   position: relative;
 }
 
 .ql-toolbar button[value=bullet] svg,
 .ql-toolbar button[value=ordered] svg,
 .ql-toolbar .trash-icon svg,
-.ql-toolbar .columns-icon svg {
+.ql-toolbar .columns-icon svg,
+.ql-toolbar .create-icon svg {
   position: absolute;
   top: 3px;
   left: 10px;
 }
 
-.ql-toolbar button:active{
+.ql-toolbar button:enabled:active {
     color: dodgerblue;
 }
 

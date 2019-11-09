@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import uuidv1 from 'uuid/v1';
+import uuidv1 from 'uuid/v1';
 import './css/index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
@@ -10,10 +10,9 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import moment from 'moment';
 import reducers from './reducers';
 
-const folderId = 1;
-const noteId = 1;
+const folderId = uuidv1();
+const noteId = uuidv1();
 const note1Date = moment().format();
-const note2Date = moment().format();
 const notes = [
   {
     id: noteId, 
@@ -21,19 +20,14 @@ const notes = [
     folderId, 
     lastUpdated: note1Date
   },
-  {
-    id: 2, 
-    note: '', 
-    folderId, 
-    lastUpdated: note2Date
-  }
 ];
 
 const initialState = {
   folders: [{id: folderId, name: 'Notes'}],
   notes,
   selectedFolderId: folderId,
-  selectedNote: notes[0],
+  selectedNote: {id: noteId, index: 0, className: 'default'},
+  createButtonDisabled: true
 };
 
 let store = createStore(reducers, initialState, composeWithDevTools());
