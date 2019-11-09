@@ -35,7 +35,6 @@ const Toolbar = forwardRef((props, ref) => {
         "ops": [{"insert":"\n"}]
       },
       noteAsText: '',
-      index: 0,
       className: 'default'
     });
   };

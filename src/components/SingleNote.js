@@ -5,7 +5,7 @@ import moment from 'moment';
 import { actions } from '../actions';
 import { isNoteEmpty } from '../utils';
 
-const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, toolbarRef }) => {
+const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, moveActiveNoteToTop, toolbarRef }) => {
   console.log('SingleNote render', note);
   const [dateTime, setDateTime] = useState('');
   const editorRef = useRef(null);
@@ -13,10 +13,8 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, tool
   const prevNoteIdRef = useRef();
 
   useEffect(() => {
-    if (dateTime === '') {
       setDateTime(moment(note.lastUpdated).format('MMMM D, YYYY [at] h:mm A'))
-    }
-  }, [dateTime, note.lastUpdated]);
+  }, [note.lastUpdated]);
 
   useEffect(() => {
     quillInstance.current = new Quill(editorRef.current, {
@@ -64,9 +62,10 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, tool
 
   useEffect(() => {
     const handler = () => {
-      // user selected another note and started typing
+      // user selected another note and started typing.
+      // move this note to top of list.
       if (note.id !== firstNote.id) {
-        // TODO dispatch(moveSelectedNoteToTop)
+        moveActiveNoteToTop(note.id);
       }
 
       const contents = quillInstance.current.getContents();
@@ -81,18 +80,19 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, tool
 
       const currentTime = moment().format('h:mm A');
       const previousTime = dateTime.split('at')[1].trim();
+      const nowMoment = moment();
       if (currentTime !== previousTime) {
-        setDateTime(moment().format('MMMM D, YYYY [at] h:mm A'));
+        setDateTime(nowMoment.format('MMMM D, YYYY [at] h:mm A'));
       }
       console.log('text-change', JSON.stringify(quillInstance.current.getText()), JSON.stringify(contents));
-      updateNote(note.id, contents, text, moment().format());
+      updateNote(note.id, contents, text, nowMoment.format());
     }
     quillInstance.current.on('text-change', handler);
 
     return () => {
       quillInstance.current.off('text-change', handler);
     }
-  }, [note.id, firstNote.id, updateNote, setCreateButtonDisabled, dateTime]);
+  }, [note.id, firstNote.id, updateNote, setCreateButtonDisabled, moveActiveNoteToTop, dateTime]);
   
   return (
     <section className="single-note">
@@ -102,14 +102,19 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, tool
   )
 };
 
-const mapStateToProps = (state) => ({
-  note: state.notes[state.selectedNote.index],
-  firstNote: state.notes[0],
-});
+const mapStateToProps = (state) => {
+  const { notes, selectedNote } = state;
+  const note = notes[notes.findIndex(val => val.id === selectedNote.id)];
+  return {
+    note,
+    firstNote: notes[0],
+  }
+};
 
 const mapDispatchToProps = {
   updateNote: actions.updateNote,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
+  moveActiveNoteToTop: actions.moveActiveNoteToTop,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleNote);

@@ -24,6 +24,19 @@ const notes = (state = [], action) => {
       })
     case types.DELETE_NOTE:
       return state.filter(note => note.id !== action.id);
+    case types.MOVE_ACTIVE_NOTE_TO_TOP:
+      const index = state.findIndex(val=> val.id === action.id);
+      if (index === state.length - 1) {
+        return [
+          state[index],
+          ...state.slice(0, index)
+        ]
+      }
+      return [
+        state[index],
+        ...state.slice(0, index),
+        ...state.slice(index + 1)
+      ]
     default:
       return state;
   }

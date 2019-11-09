@@ -10,9 +10,11 @@ import {
   CREATE_NOTE,
   UPDATE_NOTE,
   DELETE_NOTE,
+  MOVE_ACTIVE_NOTE_TO_TOP,
   createNote,
   updateNote,
   deleteNote,
+  moveActiveNoteToTop,
 } from './notes';
 import { SET_SELECTED_FOLDER_ID, setSelectedFolderId } from './selectedFolderId';
 import { SET_SELECTED_NOTE, setSelectedNote } from './selectedNote';
@@ -25,6 +27,7 @@ export const types = {
   CREATE_NOTE,
   UPDATE_NOTE,
   DELETE_NOTE,
+  MOVE_ACTIVE_NOTE_TO_TOP,
   SET_SELECTED_FOLDER_ID,
   SET_SELECTED_NOTE,
   SET_CREATE_BUTTON_DISABLED,
@@ -37,6 +40,7 @@ export const actions = {
   createNote,
   updateNote,
   deleteNote,
+  moveActiveNoteToTop,
   setSelectedFolderId,
   setSelectedNote,
   setCreateButtonDisabled,

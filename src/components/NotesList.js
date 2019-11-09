@@ -27,16 +27,9 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
     if (emptyNote) {
       setCreateButtonDisabled(false);
       deleteNote(selectedNote.id);
-      let newIndex = 0;
-      if (index > selectedNote.index) {
-        newIndex = index - 1;
-      } else if (index < selectedNote.index) {
-        newIndex = index;
-      }
       setSelectedNote({
         id: note.id,
         note: note.noteAsDelta,
-        index: newIndex,
         className: 'selected'
       });
       return;

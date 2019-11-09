@@ -4,6 +4,7 @@
 export const CREATE_NOTE = 'CREATE_NOTE';
 export const UPDATE_NOTE = 'UPDATE_NOTE';
 export const DELETE_NOTE = 'DELETE_NOTE';
+export const MOVE_ACTIVE_NOTE_TO_TOP = 'MOVE_ACTIVE_NOTE_TO_TOP';
 
 /* Action Creators */
 export const createNote = (note) => ({
@@ -23,3 +24,8 @@ export const deleteNote = (id) => ({
   type: DELETE_NOTE,
   id
 });
+
+export const moveActiveNoteToTop = (id) => ({
+  type: MOVE_ACTIVE_NOTE_TO_TOP,
+  id
+})
