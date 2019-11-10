@@ -13,11 +13,9 @@ const notes = (state = [], action) => {
         if (note.id === action.id) {
           return {
             ...note, 
-            ...{
-              noteAsDelta: action.noteAsDelta,
-              noteAsText: action.noteAsText,
-              lastUpdated: action.lastUpdated
-            }
+            noteAsDelta: action.noteAsDelta,
+            noteAsText: action.noteAsText,
+            lastUpdated: action.lastUpdated
           }
         }
         return note;
@@ -30,16 +28,16 @@ const notes = (state = [], action) => {
         return [
           state[index],
           ...state.slice(0, index)
-        ]
+        ];
       }
       return [
         state[index],
         ...state.slice(0, index),
         ...state.slice(index + 1)
-      ]
+      ];
     default:
       return state;
   }
-}
+};
 
 export default notes;

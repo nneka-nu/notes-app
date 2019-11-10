@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from'react-redux';
 import moment from 'moment';
 import { actions } from '../actions';
 import { getNotesByFolder } from '../selectors';
 import { isNoteEmpty } from '../utils';
 
-const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabled, deleteNote, toggleFolder }) => {
+const NotesList = ({ 
+  notes, 
+  selectedNote, 
+  noteToDelete,
+  setSelectedNote, 
+  setCreateButtonDisabled, 
+  deleteNote, 
+  setNoteToDelete,
+  setNotesInActiveFolder,
+  toggleFolder }) => {
   console.log('NotesList render');
 
   const handleItemClick = (note, index) => {
@@ -17,7 +26,7 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
     const currentSelectedNote = notes[currentSelectedNoteIndex];
     let emptyNote = true;
 
-    if (currentSelectedNote.noteAsText !== '') {
+    if (currentSelectedNote.noteAsText) {
       emptyNote = isNoteEmpty(currentSelectedNote.noteAsText);
     }
 
@@ -39,10 +48,43 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
     setSelectedNote({
       id: note.id,
       note: note.noteAsDelta,
-      index,
       className: 'selected'
     });
-  }
+  };
+
+  useEffect(() => {
+    setNotesInActiveFolder(notes.length > 0);
+  }, [notes.length, setNotesInActiveFolder]);
+
+  useEffect(() => {
+    if (noteToDelete) {
+      const noteToDeleteIndex = notes.findIndex(val => val.id === noteToDelete);
+
+      if (notes.length === 1) { //one note left
+        deleteNote(noteToDelete);
+        setNoteToDelete('');
+        setNotesInActiveFolder(false);
+        setCreateButtonDisabled(false);
+        return;
+      }
+
+      let newSelectedIndex;
+      if (noteToDeleteIndex === notes.length - 1) {
+        newSelectedIndex = noteToDeleteIndex - 1
+      } else {
+        newSelectedIndex = noteToDeleteIndex + 1
+      }
+
+      setSelectedNote({
+        id: notes[newSelectedIndex].id,
+        note: notes[newSelectedIndex].noteAsDelta,
+        className: 'selected'
+      });
+      deleteNote(noteToDelete);
+      setNoteToDelete('');
+      setCreateButtonDisabled(false);
+    }
+  });
 
   return (
     <section className={'notes-list ' + (toggleFolder ? '' : 'folders-hidden')}>
@@ -54,7 +96,7 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
         let secondLine = '';
         if (!emptyNote) {
           let noteArray = note.noteAsText.split(/[\n\t\r]/g);
-          let filtered = noteArray.filter(item => item !== '');
+          let filtered = noteArray.filter(item => item.trim().length > 0);
           
           if (filtered.length >= 2) {
             [firstLine, secondLine] = filtered;
@@ -100,12 +142,15 @@ const NotesList = ({ notes, selectedNote, setSelectedNote, setCreateButtonDisabl
 const mapStateToProps = (state) => ({
     notes: getNotesByFolder(state),
     selectedNote: state.selectedNote,
+    noteToDelete: state.noteToDelete,
 });
 
 const mapDispatchToProps = {
   setSelectedNote: actions.setSelectedNote,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   deleteNote: actions.deleteNote,
+  setNoteToDelete: actions.setNoteToDelete,
+  setNotesInActiveFolder: actions.setNotesInActiveFolder,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotesList);

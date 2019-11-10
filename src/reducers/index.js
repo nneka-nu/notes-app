@@ -4,6 +4,8 @@ import notes from './notes';
 import selectedFolderId from './selectedFolderId';
 import selectedNote from './selectedNote';
 import createButtonDisabled from './createButtonDisabled';
+import noteToDelete from './noteToDelete';
+import notesInActiveFolder from './notesInActiveFolder'
 
 export default combineReducers({
   folders,
@@ -11,4 +13,6 @@ export default combineReducers({
   selectedFolderId,
   selectedNote,
   createButtonDisabled,
+  noteToDelete,
+  notesInActiveFolder,
 })

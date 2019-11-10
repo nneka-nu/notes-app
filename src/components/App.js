@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import 'quill/dist/quill.bubble.css';
 import '../css/App.css';
 import Toolbar from './Toolbar';
 import FoldersList from './FoldersList';
 import NotesList from './NotesList';
 import SingleNote from './SingleNote';
+import SingleNotePlaceholder from './SingleNotePlaceholder';
 
-const App = () => {
+const App = ({ notesInActiveFolder }) => {
   console.log('App render');
   const [toggleFolder, setToggleFolder] = useState(true);
   const [toolbarRefHasValue, setToolbarRefHasValue] = useState(false);
@@ -34,13 +36,22 @@ const App = () => {
         <FoldersList toggleFolder={toggleFolder} />
         <NotesList toggleFolder={toggleFolder} />
         {toolbarRefHasValue && 
+          notesInActiveFolder &&
           <SingleNote 
             toolbarRef={toolbarRef.current}
           />
         }
+        {toolbarRefHasValue && 
+          !notesInActiveFolder && 
+          <SingleNotePlaceholder 
+            toolbarRef={toolbarRef.current} />}
       </section>
     </main>
   );
 };
 
-export default App;
+const mapStateToProps = (state) => ({
+  notesInActiveFolder: state.notesInActiveFolder,
+});
+
+export default connect(mapStateToProps, null)(App);

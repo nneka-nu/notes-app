@@ -6,7 +6,7 @@ button, input, select, textarea {
 main {
   border: 1px solid rgb(222, 222, 222);
   border-radius: 8px;
-  max-width: 800px;
+  width: 800px;
   margin: 30px auto;
 }
 

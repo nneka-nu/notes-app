@@ -1,5 +1,3 @@
-// import uuidv1 from 'uuid/v1';
-
 /* Action Types */
 export const CREATE_NOTE = 'CREATE_NOTE';
 export const UPDATE_NOTE = 'UPDATE_NOTE';
@@ -28,4 +26,4 @@ export const deleteNote = (id) => ({
 export const moveActiveNoteToTop = (id) => ({
   type: MOVE_ACTIVE_NOTE_TO_TOP,
   id
-})
+});

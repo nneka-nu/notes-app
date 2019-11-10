@@ -10,11 +10,14 @@ const Toolbar = forwardRef((props, ref) => {
   console.log('Toolbar render')
   const { 
     selectedFolderId,
+    selectedNote,
     createButtonDisabled,
+    notesInActiveFolder,
     setCreateButtonDisabled,
     setSelectedNote,
     onToggleFolder,
-    createNote } = props;
+    createNote,
+    setNoteToDelete } = props;
 
   const handleCreateNote = (e) => {
     e.currentTarget.blur();
@@ -55,9 +58,13 @@ const Toolbar = forwardRef((props, ref) => {
         <button
           title="Delete note"
           className="trash-icon"
+          disabled={!notesInActiveFolder}
           onClick={(e) => {
             e.currentTarget.blur()
-            prompt("Are you sure you want to delete this note?")}}
+            if (window.confirm("Are you sure you want to delete this note?")) {
+              setNoteToDelete(selectedNote.id);
+            }
+          }}
         >
           <GoTrashcan />
         </button>
@@ -69,13 +76,31 @@ const Toolbar = forwardRef((props, ref) => {
         >
           <FiEdit />
         </button>
-        <button className="ql-bold">B</button>
-        <button className="ql-italic">I</button>
-        <button className="ql-underline">U</button>
-        <button className="ql-list" value="ordered">
+        <button 
+          className="ql-bold" 
+          disabled={!notesInActiveFolder}>
+            B
+        </button>
+        <button 
+          className="ql-italic" 
+          disabled={!notesInActiveFolder}>
+            I
+        </button>
+        <button 
+          className="ql-underline" 
+          disabled={!notesInActiveFolder}>
+            U
+        </button>
+        <button 
+          className="ql-list" 
+          value="ordered" 
+          disabled={!notesInActiveFolder}>
           <GoListOrdered />
         </button>
-        <button className="ql-list" value="bullet">
+        <button 
+          className="ql-list" 
+          value="bullet" 
+          disabled={!notesInActiveFolder}>
           <GoListUnordered />
         </button>
       </div>
@@ -83,6 +108,7 @@ const Toolbar = forwardRef((props, ref) => {
         name="search"
         type="search"
         placeholder="Search"
+        disabled={!notesInActiveFolder}
       />
     </>
   )
@@ -91,12 +117,15 @@ const Toolbar = forwardRef((props, ref) => {
 const mapStateToProps = (state) => ({
   selectedFolderId: state.selectedFolderId,
   createButtonDisabled: state.createButtonDisabled,
+  selectedNote: state.selectedNote,
+  notesInActiveFolder: state.notesInActiveFolder,
 });
 
 const mapDispatchToProps = {
   createNote: actions.createNote,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   setSelectedNote: actions.setSelectedNote,
+  setNoteToDelete: actions.setNoteToDelete,
 };
 
 export default connect(

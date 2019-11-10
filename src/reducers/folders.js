@@ -15,9 +15,7 @@ const folders = (state = [], action) => {
         if (folder.id === action.id) {
           return {
             ...folder,
-            ...{
-              name: action.name
-            }
+            name: action.name 
           }
         }
         return folder;

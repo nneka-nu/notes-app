@@ -13,7 +13,7 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, move
   const prevNoteIdRef = useRef();
 
   useEffect(() => {
-      setDateTime(moment(note.lastUpdated).format('MMMM D, YYYY [at] h:mm A'))
+    setDateTime(moment(note.lastUpdated).format('MMMM D, YYYY [at] h:mm A'));
   }, [note.lastUpdated]);
 
   useEffect(() => {
@@ -55,10 +55,10 @@ const SingleNote = ({ note, firstNote, updateNote, setCreateButtonDisabled, move
   }, [note.id, note.noteAsDelta]);
 
   useEffect(() => {
-    if (note.noteAsText === '') {
+    if (!note.noteAsText) {
       quillInstance.current.focus();
     }
-  });
+  }, [note.noteAsText]);
 
   useEffect(() => {
     const handler = () => {
