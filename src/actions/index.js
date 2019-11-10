@@ -19,8 +19,7 @@ import {
 import { SET_SELECTED_FOLDER_ID, setSelectedFolderId } from './selectedFolderId';
 import { SET_SELECTED_NOTE_ID, setSelectedNoteId } from './selectedNoteId';
 import { SET_CREATE_BUTTON_DISABLED, setCreateButtonDisabled } from './createButtonDisabled';
-import { SET_NOTE_TO_DELETE, setNoteToDelete } from './noteToDelete';
-import { SET_NOTES_IN_ACTIVE_FOLDER, setNotesInActiveFolder} from './notesInActiveFolder';
+import { SET_SHOULD_DELETE_NOTE, setShouldDeleteNote } from './shouldDeleteNote';
 import { SET_USER_BEGAN_TYPING, setUserBeganTyping } from './userBeganTyping';
 
 export const types = { 
@@ -31,11 +30,10 @@ export const types = {
   UPDATE_NOTE,
   DELETE_NOTE,
   MOVE_ACTIVE_NOTE_TO_TOP,
-  SET_NOTE_TO_DELETE,
+  SET_SHOULD_DELETE_NOTE,
   SET_SELECTED_FOLDER_ID,
   SET_SELECTED_NOTE_ID,
   SET_CREATE_BUTTON_DISABLED,
-  SET_NOTES_IN_ACTIVE_FOLDER,
   SET_USER_BEGAN_TYPING,
 };
 
@@ -47,10 +45,9 @@ export const actions = {
   updateNote,
   deleteNote,
   moveActiveNoteToTop,
-  setNoteToDelete,
+  setShouldDeleteNote,
   setSelectedFolderId,
   setSelectedNoteId,
   setCreateButtonDisabled,
-  setNotesInActiveFolder,
   setUserBeganTyping
 };

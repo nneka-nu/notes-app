@@ -10,14 +10,13 @@ const Toolbar = forwardRef((props, ref) => {
   console.log('Toolbar render')
   const { 
     selectedFolderId,
-    selectedNoteId,
     createButtonDisabled,
-    notesInActiveFolder,
+    notesAvailable,
     setCreateButtonDisabled,
     setSelectedNoteId,
     onToggleFolder,
     createNote,
-    setNoteToDelete,
+    setShouldDeleteNote,
     setUserBeganTyping } = props;
 
   const handleCreateNote = (e) => {
@@ -38,29 +37,33 @@ const Toolbar = forwardRef((props, ref) => {
     setUserBeganTyping(true);
   };
 
+  const handleToggleFolder = (e) => {
+    e.currentTarget.blur();
+    onToggleFolder();
+  }
+
+  const handleDeleteNote = (e) => {
+    e.currentTarget.blur()
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      setShouldDeleteNote(true);
+    }
+  }
+
   return (
     <>
       <div id="quill-toolbar" ref={ref}>
         <button
           className="columns-icon"
           title="Show/hide folders"
-          onClick={(e) => {
-            e.currentTarget.blur();
-            onToggleFolder();
-          }}
+          onClick={handleToggleFolder}
         >
           <FiColumns />
         </button>
         <button
           title="Delete note"
           className="trash-icon"
-          disabled={!notesInActiveFolder}
-          onClick={(e) => {
-            e.currentTarget.blur()
-            if (window.confirm("Are you sure you want to delete this note?")) {
-              setNoteToDelete(selectedNoteId);
-            }
-          }}
+          disabled={!notesAvailable}
+          onClick={handleDeleteNote}
         >
           <GoTrashcan />
         </button>
@@ -74,29 +77,29 @@ const Toolbar = forwardRef((props, ref) => {
         </button>
         <button 
           className="ql-bold" 
-          disabled={!notesInActiveFolder}>
+          disabled={!notesAvailable}>
             B
         </button>
         <button 
           className="ql-italic" 
-          disabled={!notesInActiveFolder}>
+          disabled={!notesAvailable}>
             I
         </button>
         <button 
           className="ql-underline" 
-          disabled={!notesInActiveFolder}>
+          disabled={!notesAvailable}>
             U
         </button>
         <button 
           className="ql-list" 
           value="ordered" 
-          disabled={!notesInActiveFolder}>
+          disabled={!notesAvailable}>
           <GoListOrdered />
         </button>
         <button 
           className="ql-list" 
           value="bullet" 
-          disabled={!notesInActiveFolder}>
+          disabled={!notesAvailable}>
           <GoListUnordered />
         </button>
       </div>
@@ -104,7 +107,7 @@ const Toolbar = forwardRef((props, ref) => {
         name="search"
         type="search"
         placeholder="Search"
-        disabled={!notesInActiveFolder}
+        disabled={!notesAvailable}
       />
     </>
   );
@@ -113,15 +116,14 @@ const Toolbar = forwardRef((props, ref) => {
 const mapStateToProps = (state) => ({
   selectedFolderId: state.selectedFolderId,
   createButtonDisabled: state.createButtonDisabled,
-  selectedNoteId: state.selectedNoteId,
-  notesInActiveFolder: state.notesInActiveFolder,
+  notesAvailable: state.notes.length > 0,
 });
 
 const mapDispatchToProps = {
   createNote: actions.createNote,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   setSelectedNoteId: actions.setSelectedNoteId,
-  setNoteToDelete: actions.setNoteToDelete,
+  setShouldDeleteNote: actions.setShouldDeleteNote,
   setUserBeganTyping: actions.setUserBeganTyping,
 };
 

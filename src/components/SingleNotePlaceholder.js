@@ -23,7 +23,7 @@ const SingleNotePlaceholder = ( {toolbarRef, setCreateButtonDisabled} ) => {
   }, [toolbarRef]);
 
   return (
-    <section className="single-note">
+    <section className="single-note placeholder">
       <div className="datetime"></div>
       <div className="editor" ref={editorRef}></div>
     </section>

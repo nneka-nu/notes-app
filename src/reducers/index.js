@@ -4,8 +4,7 @@ import notes from './notes';
 import selectedFolderId from './selectedFolderId';
 import selectedNoteId from './selectedNoteId';
 import createButtonDisabled from './createButtonDisabled';
-import noteToDelete from './noteToDelete';
-import notesInActiveFolder from './notesInActiveFolder'
+import shouldDeleteNote from './shouldDeleteNote';
 import userBeganTyping from "./userBeganTyping";
 
 export default combineReducers({
@@ -14,7 +13,6 @@ export default combineReducers({
   selectedFolderId,
   selectedNoteId,
   createButtonDisabled,
-  noteToDelete,
-  notesInActiveFolder,
+  shouldDeleteNote,
   userBeganTyping,
 })

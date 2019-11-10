@@ -5,7 +5,7 @@ import { IconContext } from 'react-icons';
 
 const FoldersList = ({ folders, toggleFolder }) => {
   return (
-    <section className={'folders ' + (toggleFolder ? '' : 'active')}>
+    <section className={'folders ' + (toggleFolder ? '' : 'hidden')}>
       <div className="folders-header">Folders</div>
       <div className="folders-list">
         <ul>

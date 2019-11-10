@@ -8,13 +8,12 @@ import NoteListItem from './NoteListItem';
 const NotesList = ({ 
   notes, 
   selectedNoteId, 
-  noteToDelete,
+  shouldDeleteNote,
   userBeganTyping,
   setSelectedNoteId, 
   setCreateButtonDisabled, 
   deleteNote, 
-  setNoteToDelete,
-  setNotesInActiveFolder,
+  setShouldDeleteNote,
   setUserBeganTyping,
   toggleFolder }) => {
   console.log('NotesList render');
@@ -26,7 +25,7 @@ const NotesList = ({
     const noteData = notes[notes.findIndex(v => v.id === selectedNoteId)]
     selectedRef.current = {
       id: selectedNoteId,
-      isNoteEmpty: isNoteEmpty(noteData.noteAsText),
+      isNoteEmpty: noteData ? isNoteEmpty(noteData.noteAsText) : true,
     }
   }, [selectedNoteId, notes]);
 
@@ -63,20 +62,15 @@ const NotesList = ({
   }, [deleteNote, setCreateButtonDisabled, setSelectedNoteId, setUserBeganTyping]);
 
   useEffect(() => {
-    setNotesInActiveFolder(notes.length > 0);
-  }, [notes.length, setNotesInActiveFolder]);
-
-  useEffect(() => {
     const beganTyping = userBeganTypingRef.current;
 
-    if (noteToDelete) {
-      const noteToDeleteIndex = notes.findIndex(val => val.id === noteToDelete);
+    if (shouldDeleteNote) {
+      let currentSelectedNoteId = selectedNoteId;
+      const noteToDeleteIndex = notes.findIndex(val => val.id === currentSelectedNoteId);
 
       if (notes.length === 1) {
-        deleteNote(noteToDelete);
-        setNoteToDelete('');
-        setNotesInActiveFolder(false);
-        setCreateButtonDisabled(false);
+        deleteNote(currentSelectedNoteId);
+        setShouldDeleteNote(false);
         return;
       }
 
@@ -88,9 +82,8 @@ const NotesList = ({
       }
 
       setSelectedNoteId(notes[newSelectedIndex].id);
-      
-      deleteNote(noteToDelete);
-      setNoteToDelete('');
+      deleteNote(currentSelectedNoteId);
+      setShouldDeleteNote(false);
       setCreateButtonDisabled(false);
       if (beganTyping) {
         setUserBeganTyping(false);
@@ -118,7 +111,7 @@ const NotesList = ({
 const mapStateToProps = (state) => ({
     notes: getNotesByFolder(state),
     selectedNoteId: state.selectedNoteId,
-    noteToDelete: state.noteToDelete,
+    shouldDeleteNote: state.shouldDeleteNote,
     userBeganTyping: state.userBeganTyping,
 });
 
@@ -126,8 +119,7 @@ const mapDispatchToProps = {
   setSelectedNoteId: actions.setSelectedNoteId,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   deleteNote: actions.deleteNote,
-  setNoteToDelete: actions.setNoteToDelete,
-  setNotesInActiveFolder: actions.setNotesInActiveFolder,
+  setShouldDeleteNote: actions.setShouldDeleteNote,
   setUserBeganTyping: actions.setUserBeganTyping,
 };
 

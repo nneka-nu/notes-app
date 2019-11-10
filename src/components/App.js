@@ -8,7 +8,7 @@ import NotesList from './NotesList';
 import SingleNote from './SingleNote';
 import SingleNotePlaceholder from './SingleNotePlaceholder';
 
-const App = ({ notesInActiveFolder }) => {
+const App = ({ notesAvailable }) => {
   console.log('App render');
   const [toggleFolder, setToggleFolder] = useState(true);
   const [toolbarRefHasValue, setToolbarRefHasValue] = useState(false);
@@ -36,13 +36,13 @@ const App = ({ notesInActiveFolder }) => {
         <FoldersList toggleFolder={toggleFolder} />
         <NotesList toggleFolder={toggleFolder} />
         {toolbarRefHasValue && 
-          notesInActiveFolder &&
+          notesAvailable &&
           <SingleNote 
             toolbarRef={toolbarRef.current}
           />
         }
         {toolbarRefHasValue && 
-          !notesInActiveFolder && 
+          !notesAvailable && 
           <SingleNotePlaceholder 
             toolbarRef={toolbarRef.current} />}
       </section>
@@ -51,7 +51,7 @@ const App = ({ notesInActiveFolder }) => {
 };
 
 const mapStateToProps = (state) => ({
-  notesInActiveFolder: state.notesInActiveFolder,
+  notesAvailable: state.notes.length > 0,
 });
 
 export default connect(mapStateToProps, null)(App);
