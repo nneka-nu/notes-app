@@ -2,17 +2,19 @@ import { combineReducers } from 'redux';
 import folders from './folders';
 import notes from './notes';
 import selectedFolderId from './selectedFolderId';
-import selectedNote from './selectedNote';
+import selectedNoteId from './selectedNoteId';
 import createButtonDisabled from './createButtonDisabled';
 import noteToDelete from './noteToDelete';
 import notesInActiveFolder from './notesInActiveFolder'
+import userBeganTyping from "./userBeganTyping";
 
 export default combineReducers({
   folders,
   notes,
   selectedFolderId,
-  selectedNote,
+  selectedNoteId,
   createButtonDisabled,
   noteToDelete,
   notesInActiveFolder,
+  userBeganTyping,
 })

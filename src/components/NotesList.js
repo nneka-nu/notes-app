@@ -1,66 +1,78 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { connect } from'react-redux';
-import moment from 'moment';
 import { actions } from '../actions';
 import { getNotesByFolder } from '../selectors';
 import { isNoteEmpty } from '../utils';
+import NoteListItem from './NoteListItem';
 
 const NotesList = ({ 
   notes, 
-  selectedNote, 
+  selectedNoteId, 
   noteToDelete,
-  setSelectedNote, 
+  userBeganTyping,
+  setSelectedNoteId, 
   setCreateButtonDisabled, 
   deleteNote, 
   setNoteToDelete,
   setNotesInActiveFolder,
+  setUserBeganTyping,
   toggleFolder }) => {
   console.log('NotesList render');
+  const selectedRef = useRef();
+  const userBeganTypingRef = useRef();
 
-  const handleItemClick = (note, index) => {
-    if (selectedNote.id === note.id) {
+  useEffect(() => {
+    // set ref here to prevent unnecessary NoteListItem re-renders caused by onClick and notes changing
+    const noteData = notes[notes.findIndex(v => v.id === selectedNoteId)]
+    selectedRef.current = {
+      id: selectedNoteId,
+      isNoteEmpty: isNoteEmpty(noteData.noteAsText),
+    }
+  }, [selectedNoteId, notes]);
+
+  useEffect(() => {
+    userBeganTypingRef.current = userBeganTyping
+  }, [userBeganTyping]);
+
+  const handleItemClick = useCallback((note) => {
+    const selected = selectedRef.current;
+    const beganTyping = userBeganTypingRef.current;
+
+    if (selected.id === note.id) {
       return;
     }
-
-    const currentSelectedNoteIndex = notes.findIndex(item => item.id === selectedNote.id); 
-    const currentSelectedNote = notes[currentSelectedNoteIndex];
-    let emptyNote = true;
-
-    if (currentSelectedNote.noteAsText) {
-      emptyNote = isNoteEmpty(currentSelectedNote.noteAsText);
-    }
-
+   
     /* User selected another note after creating a new blank note 
       or after deleting contents of an old note.
       Delete blank note. */
-    if (emptyNote) {
+    if (selected.isNoteEmpty) {
       setCreateButtonDisabled(false);
-      deleteNote(selectedNote.id);
-      setSelectedNote({
-        id: note.id,
-        note: note.noteAsDelta,
-        className: 'selected'
-      });
+      deleteNote(selected.id);
+      setSelectedNoteId(note.id);
+      if (beganTyping) {
+        setUserBeganTyping(false);
+      }
       return;
     }
     
     // all notes have a value
-    setSelectedNote({
-      id: note.id,
-      note: note.noteAsDelta,
-      className: 'selected'
-    });
-  };
+    setSelectedNoteId(note.id);
+    if (beganTyping) {
+      setUserBeganTyping(false);
+    }
+  }, [deleteNote, setCreateButtonDisabled, setSelectedNoteId, setUserBeganTyping]);
 
   useEffect(() => {
     setNotesInActiveFolder(notes.length > 0);
   }, [notes.length, setNotesInActiveFolder]);
 
   useEffect(() => {
+    const beganTyping = userBeganTypingRef.current;
+
     if (noteToDelete) {
       const noteToDeleteIndex = notes.findIndex(val => val.id === noteToDelete);
 
-      if (notes.length === 1) { //one note left
+      if (notes.length === 1) {
         deleteNote(noteToDelete);
         setNoteToDelete('');
         setNotesInActiveFolder(false);
@@ -75,82 +87,48 @@ const NotesList = ({
         newSelectedIndex = noteToDeleteIndex + 1
       }
 
-      setSelectedNote({
-        id: notes[newSelectedIndex].id,
-        note: notes[newSelectedIndex].noteAsDelta,
-        className: 'selected'
-      });
+      setSelectedNoteId(notes[newSelectedIndex].id);
+      
       deleteNote(noteToDelete);
       setNoteToDelete('');
       setCreateButtonDisabled(false);
+      if (beganTyping) {
+        setUserBeganTyping(false);
+      }
     }
   });
 
   return (
     <section className={'notes-list ' + (toggleFolder ? '' : 'folders-hidden')}>
       <ul>
-      {notes.map((note, index) => {
-        let dateOrTime = '';
-        let emptyNote = isNoteEmpty(note.noteAsText);
-        let firstLine = '';
-        let secondLine = '';
-        if (!emptyNote) {
-          let noteArray = note.noteAsText.split(/[\n\t\r]/g);
-          let filtered = noteArray.filter(item => item.trim().length > 0);
-          
-          if (filtered.length >= 2) {
-            [firstLine, secondLine] = filtered;
-          } else {
-            firstLine = filtered[0];
-          }
-        }
-
-        let title = emptyNote ?  'New note' : firstLine;
-        let subtitle = !emptyNote && secondLine ? secondLine : 'No additional text';
-        let nowMoment = moment();
-        let lastUpdatedMoment = moment(note.lastUpdated);
-        let differenceInDays = nowMoment.diff(lastUpdatedMoment, 'days');
-
-        if (differenceInDays !== 0 && differenceInDays <= 6) { // show day
-          dateOrTime = lastUpdatedMoment.format('dddd')
-        } else if (differenceInDays === 0) { // show time.
-          dateOrTime = lastUpdatedMoment.format('h:mm A');
-        } else { // show date
-          dateOrTime = lastUpdatedMoment.format('MM/D/YY');
-        }
-
-        return (
-            <li 
-              key={note.id} 
-              id={note.id} 
-              className={selectedNote.id === note.id ? selectedNote.className : ''}
-              onClick={() => handleItemClick(note, index)}
-            >
-              <div className="title">{title}</div>
-              <div className="subtitle">
-                <span className="last-updated">{dateOrTime}</span> 
-                <span className="text">{subtitle}</span>
-              </div>
-            </li>
-        )
-      })}
+      {notes.map((note) => (
+        <NoteListItem 
+          key={note.id}
+          isSelected={selectedNoteId === note.id ? true : false}
+          userBeganTyping={selectedNoteId === note.id ? userBeganTyping : false}
+          note={note}
+          onClick={handleItemClick}
+        />
+      ))}
       </ul>
     </section>
-  )
+  );
 };
 
 const mapStateToProps = (state) => ({
     notes: getNotesByFolder(state),
-    selectedNote: state.selectedNote,
+    selectedNoteId: state.selectedNoteId,
     noteToDelete: state.noteToDelete,
+    userBeganTyping: state.userBeganTyping,
 });
 
 const mapDispatchToProps = {
-  setSelectedNote: actions.setSelectedNote,
+  setSelectedNoteId: actions.setSelectedNoteId,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   deleteNote: actions.deleteNote,
   setNoteToDelete: actions.setNoteToDelete,
   setNotesInActiveFolder: actions.setNotesInActiveFolder,
+  setUserBeganTyping: actions.setUserBeganTyping,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotesList);

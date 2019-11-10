@@ -10,36 +10,32 @@ const Toolbar = forwardRef((props, ref) => {
   console.log('Toolbar render')
   const { 
     selectedFolderId,
-    selectedNote,
+    selectedNoteId,
     createButtonDisabled,
     notesInActiveFolder,
     setCreateButtonDisabled,
-    setSelectedNote,
+    setSelectedNoteId,
     onToggleFolder,
     createNote,
-    setNoteToDelete } = props;
+    setNoteToDelete,
+    setUserBeganTyping } = props;
 
   const handleCreateNote = (e) => {
     e.currentTarget.blur();
+    const defaultNote = {
+      "ops": [{"insert":"\n"}]
+    };
     let newNote = {
       id: uuidv1(), 
-      noteAsDelta: {
-        "ops": [{"insert":"\n"}]
-      },
+      noteAsDelta: defaultNote,
       noteAsText: '',
       folderId: selectedFolderId, 
       lastUpdated: moment().format()
     };
     setCreateButtonDisabled(true);
     createNote(newNote);
-    setSelectedNote({
-      id: newNote.id,
-      noteAsDelta: {
-        "ops": [{"insert":"\n"}]
-      },
-      noteAsText: '',
-      className: 'default'
-    });
+    setSelectedNoteId(newNote.id);
+    setUserBeganTyping(true);
   };
 
   return (
@@ -62,7 +58,7 @@ const Toolbar = forwardRef((props, ref) => {
           onClick={(e) => {
             e.currentTarget.blur()
             if (window.confirm("Are you sure you want to delete this note?")) {
-              setNoteToDelete(selectedNote.id);
+              setNoteToDelete(selectedNoteId);
             }
           }}
         >
@@ -111,21 +107,22 @@ const Toolbar = forwardRef((props, ref) => {
         disabled={!notesInActiveFolder}
       />
     </>
-  )
+  );
 });
 
 const mapStateToProps = (state) => ({
   selectedFolderId: state.selectedFolderId,
   createButtonDisabled: state.createButtonDisabled,
-  selectedNote: state.selectedNote,
+  selectedNoteId: state.selectedNoteId,
   notesInActiveFolder: state.notesInActiveFolder,
 });
 
 const mapDispatchToProps = {
   createNote: actions.createNote,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
-  setSelectedNote: actions.setSelectedNote,
+  setSelectedNoteId: actions.setSelectedNoteId,
   setNoteToDelete: actions.setNoteToDelete,
+  setUserBeganTyping: actions.setUserBeganTyping,
 };
 
 export default connect(

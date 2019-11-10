@@ -29,7 +29,7 @@ const initialState = {
   folders: [{id: folderId, name: 'Notes'}],
   notes,
   selectedFolderId: folderId,
-  selectedNote: {id: noteId, className: 'default'},
+  selectedNoteId: noteId,
   createButtonDisabled: true
 };
 
