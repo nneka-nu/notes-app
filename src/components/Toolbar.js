@@ -5,6 +5,7 @@ import { GoListUnordered, GoListOrdered, GoTrashcan } from 'react-icons/go';
 import { FiColumns, FiEdit } from 'react-icons/fi';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
+import { getNotesByFolder } from '../selectors';
 
 const Toolbar = forwardRef((props, ref) => {
   console.log('Toolbar render')
@@ -20,7 +21,6 @@ const Toolbar = forwardRef((props, ref) => {
     setUserBeganTyping } = props;
 
   const handleCreateNote = (e) => {
-    e.currentTarget.blur();
     const defaultNote = {
       "ops": [{"insert":"\n"}]
     };
@@ -37,13 +37,11 @@ const Toolbar = forwardRef((props, ref) => {
     setUserBeganTyping(true);
   };
 
-  const handleToggleFolder = (e) => {
-    e.currentTarget.blur();
+  const handleToggleFolder = () => {
     onToggleFolder();
   }
 
-  const handleDeleteNote = (e) => {
-    e.currentTarget.blur()
+  const handleDeleteNote = () => {
     if (window.confirm("Are you sure you want to delete this note?")) {
       setShouldDeleteNote(true);
     }
@@ -113,11 +111,15 @@ const Toolbar = forwardRef((props, ref) => {
   );
 });
 
-const mapStateToProps = (state) => ({
-  selectedFolderId: state.selectedFolderId,
-  createButtonDisabled: state.createButtonDisabled,
-  notesAvailable: state.notes.length > 0,
-});
+const mapStateToProps = (state) => {
+  const notes = getNotesByFolder(state);
+
+  return {
+    selectedFolderId: state.selectedFolderId,
+    createButtonDisabled: state.createButtonDisabled,
+    notesAvailable: notes.length > 0,
+  };
+};
 
 const mapDispatchToProps = {
   createNote: actions.createNote,

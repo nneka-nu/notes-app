@@ -8,6 +8,7 @@ import NoteListItem from './NoteListItem';
 const NotesList = ({ 
   notes, 
   selectedNoteId, 
+  selectedFolderId,
   shouldDeleteNote,
   userBeganTyping,
   setSelectedNoteId, 
@@ -99,6 +100,7 @@ const NotesList = ({
           key={note.id}
           isSelected={selectedNoteId === note.id ? true : false}
           userBeganTyping={selectedNoteId === note.id ? userBeganTyping : false}
+          selectedFolderId={selectedFolderId}
           note={note}
           onClick={handleItemClick}
         />
@@ -111,6 +113,7 @@ const NotesList = ({
 const mapStateToProps = (state) => ({
     notes: getNotesByFolder(state),
     selectedNoteId: state.selectedNoteId,
+    selectedFolderId: state.selectedFolderId,
     shouldDeleteNote: state.shouldDeleteNote,
     userBeganTyping: state.userBeganTyping,
 });

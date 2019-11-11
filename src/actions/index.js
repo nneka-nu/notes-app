@@ -21,6 +21,7 @@ import { SET_SELECTED_NOTE_ID, setSelectedNoteId } from './selectedNoteId';
 import { SET_CREATE_BUTTON_DISABLED, setCreateButtonDisabled } from './createButtonDisabled';
 import { SET_SHOULD_DELETE_NOTE, setShouldDeleteNote } from './shouldDeleteNote';
 import { SET_USER_BEGAN_TYPING, setUserBeganTyping } from './userBeganTyping';
+import { SET_LAST_COMPONENT_HAS_MOUNTED, setLastComponentHasMounted } from './lastComponentHasMounted';
 
 export const types = { 
   ADD_FOLDER, 
@@ -35,6 +36,7 @@ export const types = {
   SET_SELECTED_NOTE_ID,
   SET_CREATE_BUTTON_DISABLED,
   SET_USER_BEGAN_TYPING,
+  SET_LAST_COMPONENT_HAS_MOUNTED,
 };
 
 export const actions = { 
@@ -49,5 +51,6 @@ export const actions = {
   setSelectedFolderId,
   setSelectedNoteId,
   setCreateButtonDisabled,
-  setUserBeganTyping
+  setUserBeganTyping,
+  setLastComponentHasMounted,
 };

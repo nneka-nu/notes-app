@@ -4,32 +4,50 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { actions } from '../actions';
 import { isNoteEmpty } from '../utils';
+import { getNotesByFolder } from '../selectors';
 
-
-const SingleNote = ({ note, firstNote, createButtonDisabled, userBeganTyping, updateNote, setCreateButtonDisabled, moveActiveNoteToTop, setUserBeganTyping, toolbarRef }) => {
+const SingleNote = ({ 
+  note, 
+  firstNote, 
+  createButtonDisabled, 
+  userBeganTyping, 
+  updateNote, 
+  setCreateButtonDisabled, 
+  moveActiveNoteToTop, 
+  setUserBeganTyping,
+  setLastComponentHasMounted,
+  toolbarRef }) => {
   console.log('SingleNote render', note);
-  const [dateTime, setDateTime] = useState('');
+  const dateTimeRef = useRef();
   const editorRef = useRef(null);
   const quillInstance = useRef(null);
   const prevNoteIdRef = useRef();
   const prevUserBeganTyping = useRef();
+  const prevCreateButtonDisabled = useRef();
+  const [showDateTime, setShowDateTime] = useState(false);
 
   useEffect(() => {
     prevUserBeganTyping.current = userBeganTyping;
   }, [userBeganTyping]);
 
   useEffect(() => {
-    setDateTime(moment(note.lastUpdated).format('MMMM D, YYYY [at] h:mm A'));
-  }, [note.lastUpdated]);
+    prevCreateButtonDisabled.current = createButtonDisabled;
+  }, [createButtonDisabled]);
+
+  useEffect(() => {
+    if (!note) {
+      return;
+    }
+
+    dateTimeRef.current = moment(note.lastUpdated).format('MMMM D, YYYY [at] h:mm A');
+  }, [note]);
 
   useEffect(() => {
     quillInstance.current = new Quill(editorRef.current, {
       modules: {
         toolbar: toolbarRef
       },
-      placeholder: 'Enter notes...',
     });
-    quillInstance.current.focus();
     // allow plain text pasting only
     quillInstance.current.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
       let ops = [];
@@ -44,32 +62,52 @@ const SingleNote = ({ note, firstNote, createButtonDisabled, userBeganTyping, up
       return delta;
     });
   }, [toolbarRef]);
-  
+
   useEffect(() => {
-    if (prevNoteIdRef.current === note.id) {
+    if (!note) {
+      prevNoteIdRef.current = '';
+      quillInstance.current.setText('');
+      quillInstance.current.enable(false);
+      setShowDateTime(false);
       return;
     }
+
+    quillInstance.current.enable(true);
+    setShowDateTime(true);
+
+    if (prevNoteIdRef.current && prevNoteIdRef.current === note.id) {
+      return;
+    }
+    
     prevNoteIdRef.current = note.id;
 
     if (note.noteAsDelta) {
       try {
         quillInstance.current.setContents(note.noteAsDelta);
       } catch (e) {
-        console.log(e);
+        // console.error(e);
       }
     } 
-  }, [note.id, note.noteAsDelta]);
+  }, [note]);
 
   useEffect(() => {
+    if (!note) {
+      return;
+    }
+
     if (!note.noteAsText) {
       quillInstance.current.focus();
     }
-  }, [note.noteAsText]);
+  }, [note]);
 
   useEffect(() => {
+    if (!note) {
+      return;
+    }
+
     const handler = () => {
       // user selected another note and started typing.
-      if (note.id !== firstNote.id) {
+      if (firstNote && note.id !== firstNote.id) {
         moveActiveNoteToTop(note.id);
       }
 
@@ -77,21 +115,21 @@ const SingleNote = ({ note, firstNote, createButtonDisabled, userBeganTyping, up
       const text = quillInstance.current.getText();
       const emptyNote = isNoteEmpty(text);
 
-      if (emptyNote) {
+      if (emptyNote && !prevCreateButtonDisabled.current) {
         setCreateButtonDisabled(true);
       }
 
       if (!emptyNote) {
-        if (createButtonDisabled) {
+        if (prevCreateButtonDisabled.current) {
           setCreateButtonDisabled(false);
         } 
       }
 
       const currentTime = moment().format('h:mm A');
-      const previousTime = dateTime.split('at')[1].trim();
+      const previousTime = dateTimeRef.current.split('at')[1].trim();
       const nowMoment = moment();
       if (currentTime !== previousTime) {
-        setDateTime(nowMoment.format('MMMM D, YYYY [at] h:mm A'));
+        dateTimeRef.current = nowMoment.format('MMMM D, YYYY [at] h:mm A');
       }
 
       updateNote(note.id, contents, text, nowMoment.format());
@@ -101,7 +139,11 @@ const SingleNote = ({ note, firstNote, createButtonDisabled, userBeganTyping, up
     return () => {
       quillInstance.current.off('text-change', handler);
     }
-  }, [note.id, firstNote.id, dateTime, createButtonDisabled, updateNote, setCreateButtonDisabled, moveActiveNoteToTop]);
+  }, [note, firstNote, updateNote, setCreateButtonDisabled, moveActiveNoteToTop]);
+
+  useEffect(() => {
+    setLastComponentHasMounted(true);
+  }, [setLastComponentHasMounted]);
 
   const handleNoteClick = () => {
     if (!prevUserBeganTyping.current) {
@@ -111,14 +153,19 @@ const SingleNote = ({ note, firstNote, createButtonDisabled, userBeganTyping, up
 
   return (
     <section className="single-note">
-      <div className="datetime">{dateTime}</div>
-      <div className="editor" ref={editorRef} onClick={handleNoteClick}></div>
+      {showDateTime && <div className="datetime">{dateTimeRef.current}</div>}
+      <div 
+        className="editor" 
+        ref={editorRef} 
+        onClick={handleNoteClick}>
+      </div>
     </section>
   );
 };
 
 const mapStateToProps = (state) => {
-  const { notes, selectedNoteId, createButtonDisabled, userBeganTyping } = state;
+  const { selectedNoteId, createButtonDisabled, userBeganTyping } = state;
+  const notes = getNotesByFolder(state);
   const note = notes[notes.findIndex(val => val.id === selectedNoteId)];
   return {
     note,
@@ -133,6 +180,7 @@ const mapDispatchToProps = {
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   moveActiveNoteToTop: actions.moveActiveNoteToTop,
   setUserBeganTyping: actions.setUserBeganTyping,
+  setLastComponentHasMounted: actions.setLastComponentHasMounted,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleNote);

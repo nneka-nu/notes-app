@@ -5,7 +5,8 @@ import selectedFolderId from './selectedFolderId';
 import selectedNoteId from './selectedNoteId';
 import createButtonDisabled from './createButtonDisabled';
 import shouldDeleteNote from './shouldDeleteNote';
-import userBeganTyping from "./userBeganTyping";
+import userBeganTyping from './userBeganTyping';
+import lastComponentHasMounted from './lastComponentHasMounted';
 
 export default combineReducers({
   folders,
@@ -15,4 +16,5 @@ export default combineReducers({
   createButtonDisabled,
   shouldDeleteNote,
   userBeganTyping,
+  lastComponentHasMounted,
 })

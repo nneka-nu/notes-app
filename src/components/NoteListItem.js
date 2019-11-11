@@ -1,13 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 import { isNoteEmpty } from '../utils';
 
 // isolated so list item is highlighted by Profiler on render
-const ListItem = ({ title, subtitle, dateOrTime, isSelected, userBeganTyping, onClick }) => {
-  let className = isSelected ? 'selected' : '';
-  if (isSelected && userBeganTyping) {
-    className = 'default';
-  }
+const ListItem = ({ 
+  title, 
+  subtitle, 
+  dateOrTime, 
+  isSelected, 
+  userBeganTyping, 
+  selectedFolderId, 
+  onClick }) => {
+  const folderIdRef = useRef();
+  const [className, setClassName] = useState('');
+  
+  useEffect(() => {
+    setClassName(isSelected ? 'selected' : '');
+    if (isSelected && userBeganTyping) {
+      setClassName('default');
+    }
+  }, [isSelected, userBeganTyping]);
+
+  useEffect(() => {
+    if (isSelected && folderIdRef.current !== selectedFolderId) {
+      setClassName('default');
+    }
+    folderIdRef.current = selectedFolderId;
+  }, [isSelected, selectedFolderId]);
 
   return (
     <li 
@@ -23,7 +42,12 @@ const ListItem = ({ title, subtitle, dateOrTime, isSelected, userBeganTyping, on
   );
 };
 
-const NoteListItem = ({ note, isSelected, userBeganTyping, onClick }) => {
+const NoteListItem = ({ 
+  note, 
+  isSelected, 
+  userBeganTyping, 
+  selectedFolderId,
+  onClick }) => {
   console.log('NoteListItem render', note.id)
   let dateOrTime = '';
   let emptyNote = isNoteEmpty(note.noteAsText);
@@ -61,6 +85,7 @@ const NoteListItem = ({ note, isSelected, userBeganTyping, onClick }) => {
       dateOrTime={dateOrTime} 
       isSelected={isSelected}
       userBeganTyping={userBeganTyping}
+      selectedFolderId={selectedFolderId}
       onClick={() => onClick(note)}
     />
   );
