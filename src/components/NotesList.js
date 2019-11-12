@@ -98,7 +98,7 @@ const NotesList = ({
       {notes.map((note) => (
         <NoteListItem 
           key={note.id}
-          isSelected={selectedNoteId === note.id ? true : false}
+          isSelected={selectedNoteId === note.id}
           userBeganTyping={selectedNoteId === note.id ? userBeganTyping : false}
           selectedFolderId={selectedFolderId}
           note={note}

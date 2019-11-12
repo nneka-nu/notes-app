@@ -9,10 +9,12 @@ import { Provider } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import moment from 'moment';
 import reducers from './reducers';
+import { getSavedState, setSavedState } from './localStorage';
+import throttle from 'lodash.throttle';
 
 const folderId = uuidv1();
 const noteId = uuidv1();
-const note1Date = moment().format();
+const lastUpdated = moment().format();
 const notes = [
   {
     id: noteId, 
@@ -21,10 +23,9 @@ const notes = [
     },
     noteAsText: '',
     folderId, 
-    lastUpdated: note1Date
+    lastUpdated
   },
 ];
-
 const initialState = {
   folders: [{id: folderId, name: 'Notes'}],
   notes,
@@ -32,8 +33,16 @@ const initialState = {
   selectedNoteId: noteId,
   createButtonDisabled: true
 };
+const savedState = getSavedState();
+const store = createStore(
+  reducers, 
+  savedState || initialState, 
+  composeWithDevTools()
+);
 
-let store = createStore(reducers, initialState, composeWithDevTools());
+store.subscribe(throttle(() => {
+  setSavedState(store.getState());
+}, 1000));
 
 ReactDOM.render(
   <Provider store={store}>
