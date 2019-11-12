@@ -166,7 +166,8 @@ const SingleNote = ({
 const mapStateToProps = (state) => {
   const { selectedNoteId, createButtonDisabled, userBeganTyping } = state;
   const notes = getNotesByFolder(state);
-  const note = notes[notes.findIndex(val => val.id === selectedNoteId)];
+  const noteIndex = notes.findIndex(val => val.id === selectedNoteId);
+  const note = noteIndex > -1 ? notes[noteIndex] : '';
   return {
     note,
     firstNote: notes[0],

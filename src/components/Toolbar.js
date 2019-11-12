@@ -20,7 +20,7 @@ const Toolbar = forwardRef((props, ref) => {
     setShouldDeleteNote,
     setUserBeganTyping } = props;
 
-  const handleCreateNote = (e) => {
+  const handleCreateNote = () => {
     const defaultNote = {
       "ops": [{"insert":"\n"}]
     };

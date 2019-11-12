@@ -22,12 +22,13 @@ const NotesList = ({
   const userBeganTypingRef = useRef();
 
   useEffect(() => {
-    // set ref here to prevent unnecessary NoteListItem re-renders caused by onClick and notes changing
-    const noteData = notes[notes.findIndex(v => v.id === selectedNoteId)]
+    // set selectedRef here to prevent unnecessary NoteListItem re-renders caused by onClick and notes changing
+    const noteIndex = notes.findIndex(v => v.id === selectedNoteId);
+    const noteData = noteIndex > -1 ? notes[noteIndex] : '';
     selectedRef.current = {
       id: selectedNoteId,
       isNoteEmpty: noteData ? isNoteEmpty(noteData.noteAsText) : true,
-    }
+    };
   }, [selectedNoteId, notes]);
 
   useEffect(() => {
@@ -66,11 +67,10 @@ const NotesList = ({
     const beganTyping = userBeganTypingRef.current;
 
     if (shouldDeleteNote) {
-      let currentSelectedNoteId = selectedNoteId;
-      const noteToDeleteIndex = notes.findIndex(val => val.id === currentSelectedNoteId);
+      const noteToDeleteIndex = notes.findIndex(val => val.id === selectedNoteId);
 
       if (notes.length === 1) {
-        deleteNote(currentSelectedNoteId);
+        deleteNote(selectedNoteId);
         setShouldDeleteNote(false);
         return;
       }
@@ -83,7 +83,7 @@ const NotesList = ({
       }
 
       setSelectedNoteId(notes[newSelectedIndex].id);
-      deleteNote(currentSelectedNoteId);
+      deleteNote(selectedNoteId);
       setShouldDeleteNote(false);
       setCreateButtonDisabled(false);
       if (beganTyping) {
