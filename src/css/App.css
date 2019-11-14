@@ -205,6 +205,7 @@ input[type=search] {
   flex-direction: column;
   justify-content: center;
   position: relative;
+  outline: none;
 }
 
 .notes-list ul li:before {
