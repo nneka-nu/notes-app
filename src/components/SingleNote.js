@@ -4,17 +4,18 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { actions } from '../actions';
 import { isNoteEmpty } from '../utils';
-import { getNotesByFolder } from '../selectors';
+import { getNotesByFolder, getNotesBySearch } from '../selectors';
 
 const SingleNote = ({ 
   note, 
   firstNote, 
+  searchTerm,
+  setSelectedNoteId,
   createButtonDisabled, 
-  userBeganTyping, 
   updateNote, 
+  deleteNote,
   setCreateButtonDisabled, 
   moveActiveNoteToTop, 
-  setUserBeganTyping,
   setLastComponentHasMounted,
   toolbarRef }) => {
   console.log('SingleNote render', note);
@@ -22,13 +23,13 @@ const SingleNote = ({
   const editorRef = useRef(null);
   const quillInstance = useRef(null);
   const prevNoteIdRef = useRef();
-  const prevUserBeganTyping = useRef();
   const prevCreateButtonDisabled = useRef();
+  const searchTermRef = useRef();
   const [showDateTime, setShowDateTime] = useState(false);
 
   useEffect(() => {
-    prevUserBeganTyping.current = userBeganTyping;
-  }, [userBeganTyping]);
+    searchTermRef.current = searchTerm;
+  }, [searchTerm]);
 
   useEffect(() => {
     prevCreateButtonDisabled.current = createButtonDisabled;
@@ -107,7 +108,7 @@ const SingleNote = ({
 
     const handler = () => {
       // user selected another note and started typing.
-      if (firstNote && note.id !== firstNote.id) {
+      if (firstNote && note.id !== firstNote.id && !searchTermRef.current) {
         moveActiveNoteToTop(note.id);
       }
 
@@ -115,8 +116,14 @@ const SingleNote = ({
       const text = quillInstance.current.getText();
       const emptyNote = isNoteEmpty(text);
 
-      if (emptyNote && !prevCreateButtonDisabled.current) {
+      if (emptyNote && !prevCreateButtonDisabled.current && !searchTermRef.current) {
         setCreateButtonDisabled(true);
+      }
+
+      if (emptyNote && searchTermRef.current) {
+        deleteNote(note.id);
+        setSelectedNoteId(firstNote.id);
+        return;
       }
 
       if (!emptyNote) {
@@ -139,17 +146,11 @@ const SingleNote = ({
     return () => {
       quillInstance.current.off('text-change', handler);
     }
-  }, [note, firstNote, updateNote, setCreateButtonDisabled, moveActiveNoteToTop]);
+  }, [note, firstNote, updateNote, deleteNote, setCreateButtonDisabled, moveActiveNoteToTop, setSelectedNoteId]);
 
   useEffect(() => {
     setLastComponentHasMounted(true);
   }, [setLastComponentHasMounted]);
-
-  const handleNoteClick = () => {
-    if (!prevUserBeganTyping.current) {
-      setUserBeganTyping(true)
-    }
-  }
 
   return (
     <section className="single-note">
@@ -157,22 +158,25 @@ const SingleNote = ({
       <div 
         className="editor" 
         ref={editorRef} 
-        onClick={handleNoteClick}>
+      >
       </div>
     </section>
   );
 };
 
 const mapStateToProps = (state) => {
-  const { selectedNoteId, createButtonDisabled, userBeganTyping } = state;
-  const notes = getNotesByFolder(state);
+  const { selectedNoteId, createButtonDisabled, search } = state;
+  const searchTerm = search.term.trim();
+  let notes = searchTerm ? getNotesBySearch(state) : getNotesByFolder(state);
+  let note = {};
   const noteIndex = notes.findIndex(val => val.id === selectedNoteId);
-  const note = noteIndex > -1 ? notes[noteIndex] : '';
+  note = noteIndex > -1 ? notes[noteIndex] : '';
+
   return {
     note,
     firstNote: notes[0],
     createButtonDisabled,
-    userBeganTyping,
+    searchTerm,
   }
 };
 
@@ -180,8 +184,9 @@ const mapDispatchToProps = {
   updateNote: actions.updateNote,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   moveActiveNoteToTop: actions.moveActiveNoteToTop,
-  setUserBeganTyping: actions.setUserBeganTyping,
   setLastComponentHasMounted: actions.setLastComponentHasMounted,
+  setSelectedNoteId: actions.setSelectedNoteId,
+  deleteNote: actions.deleteNote,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleNote);

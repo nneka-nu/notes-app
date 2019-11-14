@@ -1,44 +1,33 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { connect } from'react-redux';
 import { actions } from '../actions';
-import { getNotesByFolder } from '../selectors';
+import { getNotesByFolder, getNotesBySearch } from '../selectors';
 import { isNoteEmpty } from '../utils';
-import NoteListItem from './NoteListItem';
+import NoteListItemWrapper from './NoteListItemWrapper';
+import { setSearchInfo } from '../actions/search';
 
 const NotesList = ({ 
   notes, 
   selectedNoteId, 
   selectedFolderId,
+  search,
+  allNotes,
+  folders,
   shouldDeleteNote,
-  userBeganTyping,
   setSelectedNoteId, 
   setCreateButtonDisabled, 
   deleteNote, 
   setShouldDeleteNote,
-  setUserBeganTyping,
   toggleFolder }) => {
   console.log('NotesList render');
   const selectedRef = useRef();
-  const userBeganTypingRef = useRef();
-
-  useEffect(() => {
-    // set selectedRef here to prevent unnecessary NoteListItem re-renders caused by onClick and notes changing
-    const noteIndex = notes.findIndex(v => v.id === selectedNoteId);
-    const noteData = noteIndex > -1 ? notes[noteIndex] : '';
-    selectedRef.current = {
-      id: selectedNoteId,
-      isNoteEmpty: noteData ? isNoteEmpty(noteData.noteAsText) : true,
-    };
-  }, [selectedNoteId, notes]);
-
-  useEffect(() => {
-    userBeganTypingRef.current = userBeganTyping
-  }, [userBeganTyping]);
+  const selectedFolderIdRef = useRef();
+  const selectedNoteIdRef = useRef();
+  const allNotesRef = useRef(); // no search/folder filter
+  const notesRef = useRef();
 
   const handleItemClick = useCallback((note) => {
     const selected = selectedRef.current;
-    const beganTyping = userBeganTypingRef.current;
-
     if (selected.id === note.id) {
       return;
     }
@@ -50,22 +39,55 @@ const NotesList = ({
       setCreateButtonDisabled(false);
       deleteNote(selected.id);
       setSelectedNoteId(note.id);
-      if (beganTyping) {
-        setUserBeganTyping(false);
-      }
       return;
     }
     
     // all notes have a value
     setSelectedNoteId(note.id);
-    if (beganTyping) {
-      setUserBeganTyping(false);
-    }
-  }, [deleteNote, setCreateButtonDisabled, setSelectedNoteId, setUserBeganTyping]);
+  }, [deleteNote, setCreateButtonDisabled, setSelectedNoteId]);
 
   useEffect(() => {
-    const beganTyping = userBeganTypingRef.current;
+    selectedFolderIdRef.current = selectedFolderId;
+    selectedNoteIdRef.current = selectedNoteId;
+    allNotesRef.current = allNotes;
+    notesRef.current = notes;
+  }, [selectedFolderId, selectedNoteId, allNotes, notes]);
 
+  useEffect(() => {
+    if (search.term.trim()) {
+      if (notesRef.current.length > 0) {
+        setSelectedNoteId(notesRef.current[0].id);
+      } else {
+        setSelectedNoteId('');
+      }
+    }
+  }, [search, setSelectedNoteId]);
+
+  useEffect(() => {
+    if (search.isSearchComplete && selectedFolderIdRef.current) {
+      let selectedfolderNotes = allNotesRef.current.filter(note => 
+        note.folderId === selectedFolderIdRef.current
+      );
+      if (selectedfolderNotes.length > 0) {
+        setSelectedNoteId(selectedfolderNotes[0].id);
+      } else {
+        setSelectedNoteId('');
+      }
+      setSearchInfo('', false);
+    }
+  }, [search, setSelectedNoteId]);
+
+  useEffect(() => {
+    // set selectedRef here to prevent unnecessary NoteListItemWrapper re-renders caused by onClick and notes changing
+    const noteIndex = notes.findIndex(v => v.id === selectedNoteId);
+    const noteData = noteIndex > -1 ? notes[noteIndex] : '';
+    selectedRef.current = {
+      id: selectedNoteId,
+      isNoteEmpty: noteData ? isNoteEmpty(noteData.noteAsText) : true,
+    };
+  }, [selectedNoteId, notes]);
+
+  useEffect(() => {
     if (shouldDeleteNote) {
       const noteToDeleteIndex = notes.findIndex(val => val.id === selectedNoteId);
 
@@ -86,44 +108,58 @@ const NotesList = ({
       deleteNote(selectedNoteId);
       setShouldDeleteNote(false);
       setCreateButtonDisabled(false);
-      if (beganTyping) {
-        setUserBeganTyping(false);
-      }
     }
   });
 
   return (
     <section className={'notes-list ' + (toggleFolder ? '' : 'folders-hidden')}>
       <ul>
-      {notes.map((note) => (
-        <NoteListItem 
-          key={note.id}
-          isSelected={selectedNoteId === note.id}
-          userBeganTyping={selectedNoteId === note.id ? userBeganTyping : false}
-          selectedFolderId={selectedFolderId}
-          note={note}
-          onClick={handleItemClick}
-        />
-      ))}
+      {notes.map((note) => {
+        const folder = folders.filter(folder => folder.id === note.folderId);
+        const folderName = folder.length > 0 ? folder[0].name : '';
+        return (
+          <NoteListItemWrapper 
+            key={note.id}
+            isSelected={selectedNoteId === note.id}
+            selectedFolderId={selectedFolderId}
+            folderName={folderName}
+            searchTerm={search.term}
+            note={note}
+            onClick={handleItemClick}
+          />
+        )
+      })}
       </ul>
     </section>
   );
 };
 
-const mapStateToProps = (state) => ({
-    notes: getNotesByFolder(state),
+
+const mapStateToProps = (state) => {
+  let notes = [];
+  const term = state.search.term;
+  if (term) {
+    notes = getNotesBySearch(state);
+  } else {
+    notes = getNotesByFolder(state);
+  }
+
+  return {
+    notes,
+    allNotes: state.notes,
+    folders: state.folders,
     selectedNoteId: state.selectedNoteId,
     selectedFolderId: state.selectedFolderId,
     shouldDeleteNote: state.shouldDeleteNote,
-    userBeganTyping: state.userBeganTyping,
-});
+    search: state.search,
+  }
+};
 
 const mapDispatchToProps = {
   setSelectedNoteId: actions.setSelectedNoteId,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   deleteNote: actions.deleteNote,
   setShouldDeleteNote: actions.setShouldDeleteNote,
-  setUserBeganTyping: actions.setUserBeganTyping,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotesList);

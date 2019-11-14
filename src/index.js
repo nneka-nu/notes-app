@@ -41,7 +41,14 @@ const store = createStore(
 );
 
 store.subscribe(throttle(() => {
-  setSavedState(store.getState());
+  let state = {
+    ...store.getState(),
+    search: {
+      term: '',
+      progress: '',
+    }
+  }
+  setSavedState(state);
 }, 1000));
 
 ReactDOM.render(

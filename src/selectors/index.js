@@ -7,4 +7,14 @@ export const getNotesByFolder = createSelector(
   (notes, selectedFolderId) => {
     return notes.filter(note => note.folderId === selectedFolderId);
   }
-)
+);
+
+const searchSelector = state => state.search;
+export const getNotesBySearch = createSelector(
+  [notesSelector, searchSelector],
+  (notes, search) => {
+    return notes.filter(note => {
+      return note.noteAsText.toLowerCase().includes(search.term.toLowerCase());
+    });
+  }
+);

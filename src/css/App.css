@@ -251,6 +251,26 @@ input[type=search] {
   border: none;
 }
 
+.notes-list .search-term {
+  color: palevioletred;
+}
+
+.notes-list .folder-name {
+  display: flex;
+}
+
+.notes-list .folder-name .icon {
+  margin-right: 3px;
+}
+
+.notes-list .folder-name span {
+  font-size: 0.77rem;
+  color: rgb(80, 80, 80);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .single-note {
   flex: 2;
   background: rgb(253, 253, 253);

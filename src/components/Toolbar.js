@@ -5,7 +5,8 @@ import { GoListUnordered, GoListOrdered, GoTrashcan } from 'react-icons/go';
 import { FiColumns, FiEdit } from 'react-icons/fi';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
-import { getNotesByFolder } from '../selectors';
+import { getNotesByFolder, getNotesBySearch } from '../selectors';
+import { isNoteEmpty } from '../utils';
 
 const Toolbar = forwardRef((props, ref) => {
   console.log('Toolbar render')
@@ -13,14 +14,18 @@ const Toolbar = forwardRef((props, ref) => {
     selectedFolderId,
     createButtonDisabled,
     notesAvailable,
+    firstNote,
+    search,
     setCreateButtonDisabled,
     setSelectedNoteId,
     onToggleFolder,
     createNote,
     setShouldDeleteNote,
-    setUserBeganTyping } = props;
+    setSearchInfo,
+    deleteNote } = props;
 
   const handleCreateNote = () => {
+    setSearchInfo('', false);
     const defaultNote = {
       "ops": [{"insert":"\n"}]
     };
@@ -34,18 +39,29 @@ const Toolbar = forwardRef((props, ref) => {
     setCreateButtonDisabled(true);
     createNote(newNote);
     setSelectedNoteId(newNote.id);
-    setUserBeganTyping(true);
   };
 
   const handleToggleFolder = () => {
     onToggleFolder();
-  }
+  };
 
   const handleDeleteNote = () => {
     if (window.confirm("Are you sure you want to delete this note?")) {
       setShouldDeleteNote(true);
     }
-  }
+  };
+
+  const handleSearch = (e) => {
+    if (firstNote && isNoteEmpty(firstNote.noteAsText)) {
+      deleteNote(firstNote.id);
+    }
+    let term = e.target.value;
+    if (!term.trim()) {
+      setSearchInfo('', true)
+      return;
+    }
+    setSearchInfo(term, false);
+  };
 
   return (
     <>
@@ -105,19 +121,28 @@ const Toolbar = forwardRef((props, ref) => {
         name="search"
         type="search"
         placeholder="Search"
-        disabled={!notesAvailable}
+        value={search.term}
+        onChange={handleSearch}
       />
     </>
   );
 });
 
 const mapStateToProps = (state) => {
-  const notes = getNotesByFolder(state);
+  let notes = [];
+  const term = state.search.term;
+  if (term) {
+    notes = getNotesBySearch(state);
+  } else {
+    notes = getNotesByFolder(state);
+  }
 
   return {
     selectedFolderId: state.selectedFolderId,
     createButtonDisabled: state.createButtonDisabled,
     notesAvailable: notes.length > 0,
+    firstNote: notes[0],
+    search: state.search,
   };
 };
 
@@ -126,7 +151,8 @@ const mapDispatchToProps = {
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   setSelectedNoteId: actions.setSelectedNoteId,
   setShouldDeleteNote: actions.setShouldDeleteNote,
-  setUserBeganTyping: actions.setUserBeganTyping,
+  setSearchInfo: actions.setSearchInfo,
+  deleteNote: actions.deleteNote,
 };
 
 export default connect(

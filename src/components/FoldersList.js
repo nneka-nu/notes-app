@@ -15,13 +15,15 @@ const FoldersList = ({
   lastComponentHasMounted,
   selectedFolderId,
   selectedNoteId,
+  search,
   toggleFolder, 
   setSelectedFolderId,
   setSelectedNoteId,
   setCreateButtonDisabled,
   deleteNote,
   addFolder, 
-  deleteFolder, }) => {
+  deleteFolder,
+  setSearchInfo }) => {
   console.log('FoldersList render', selectedFolderId);
   const foldersListElem = useRef();
   const notesRef = useRef();
@@ -29,6 +31,7 @@ const FoldersList = ({
   const firstNoteByFolderRef = useRef();
   const selectedNoteIdRef = useRef();
   const selectedFolderIdRef = useRef();
+  const searchRef = useRef();
 
   useEffect(() => {
     notesRef.current = notes;
@@ -36,7 +39,8 @@ const FoldersList = ({
     selectedNoteIdRef.current = selectedNoteId;
     selectedFolderIdRef.current = selectedFolderId;
     firstNoteByFolderRef.current = firstNoteByFolder;
-  }, [notes, selectedFolderId, firstNoteByFolder, selectedNoteId, folders]);
+    searchRef.current = search;
+  }, [notes, selectedFolderId, firstNoteByFolder, selectedNoteId, folders, search]);
 
   useEffect(() => {
     if (foldersRef.current.length === 0) {
@@ -60,8 +64,8 @@ const FoldersList = ({
       return;
     }
 
-    if (firstNoteByFolderRef.current && isNoteEmpty(firstNoteByFolderRef.current.noteAsText)) {
-      deleteNote(selectedNoteIdRef.current)
+    if (!searchRef.current.term && firstNoteByFolderRef.current && isNoteEmpty(firstNoteByFolderRef.current.noteAsText)) {
+      deleteNote(selectedNoteIdRef.current);
     }
 
     const firstNoteAtId = notesRef.current.filter(note => note.folderId === id)[0];
@@ -71,10 +75,12 @@ const FoldersList = ({
     } else {
       setSelectedNoteId('');
     }
-    setSelectedFolderId(id)
-  }, [deleteNote, setSelectedNoteId, setSelectedFolderId]);
+    setSelectedFolderId(id);
+    setSearchInfo('', false);
+  }, [deleteNote, setSelectedNoteId, setSelectedFolderId, setSearchInfo]);
 
   const handleNewFolderClick = () => {
+    setSearchInfo('', false);
     let name = prompt("Enter folder name");
     if (name === null) { // user hit cancel
       return;
@@ -95,11 +101,12 @@ const FoldersList = ({
       setCreateButtonDisabled(false);
       foldersListElem.current.scrollTop = foldersListElem.current.offsetHeight;
     } else {
-      alert('That folder name is exists.');
+      alert('That folder name already exists.');
     }
   };
 
   const handleDeleteFolder = useCallback((id) => {
+    setSearchInfo('', false);
     const allFolders = foldersRef.current;
     let folderIndex = allFolders.findIndex(folder => folder.id === id);
     if (folderIndex === -1) {
@@ -131,7 +138,7 @@ const FoldersList = ({
     notesAtFolderToDelete.forEach(note => {
       deleteNote(note.id);
     });
-  }, [deleteFolder, deleteNote, setSelectedFolderId, setSelectedNoteId, setCreateButtonDisabled]);
+  }, [deleteFolder, deleteNote, setSelectedFolderId, setSelectedNoteId, setCreateButtonDisabled, setSearchInfo]);
 
   return (
     <section className={'folders ' + (toggleFolder ? '' : 'hidden')}>
@@ -179,6 +186,7 @@ const mapStateToProps = (state) => {
     notes: state.notes,
     firstNoteByFolder: notesByFolder[0],
     lastComponentHasMounted: state.lastComponentHasMounted,
+    search: state.search,
   };
 };
 
@@ -189,6 +197,7 @@ const mapDispatchToProps = {
   deleteNote: actions.deleteNote,
   addFolder: actions.addFolder,
   deleteFolder: actions.deleteFolder,
+  setSearchInfo: actions.setSearchInfo,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(FoldersList);
