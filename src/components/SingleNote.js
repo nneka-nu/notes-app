@@ -17,7 +17,7 @@ const SingleNote = ({
   setCreateButtonDisabled, 
   moveActiveNoteToTop, 
   toolbarRef }) => {
-  const dateTimeRef = useRef();
+  const [dateTime, setDateTime] = useState();
   const editorRef = useRef(null);
   const quillInstance = useRef(null);
   const prevNoteIdRef = useRef();
@@ -38,7 +38,7 @@ const SingleNote = ({
       return;
     }
 
-    dateTimeRef.current = moment(note.lastUpdated).format('MMMM D, YYYY [at] h:mm A');
+    setDateTime(moment(note.lastUpdated).format('MMMM D, YYYY [at] h:mm A'));
   }, [note]);
 
   useEffect(() => {
@@ -130,14 +130,7 @@ const SingleNote = ({
         } 
       }
 
-      const currentTime = moment().format('h:mm A');
-      const previousTime = dateTimeRef.current.split('at')[1].trim();
-      const nowMoment = moment();
-      if (currentTime !== previousTime) {
-        dateTimeRef.current = nowMoment.format('MMMM D, YYYY [at] h:mm A');
-      }
-
-      updateNote(note.id, contents, text, nowMoment.format());
+      updateNote(note.id, contents, text, moment().format());
     }
     quillInstance.current.on('text-change', handler);
 
@@ -148,7 +141,7 @@ const SingleNote = ({
 
   return (
     <section className="single-note">
-      {showDateTime && <div className="datetime">{dateTimeRef.current}</div>}
+      {showDateTime && <div className="datetime">{dateTime}</div>}
       <div 
         className="editor" 
         ref={editorRef} 

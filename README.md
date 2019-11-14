@@ -1,4 +1,5 @@
 **Installation**: Run npm install, then npm start.
+
 **Features:**
 * Create, read, update, and delete notes and folders.
 * Search notes.
