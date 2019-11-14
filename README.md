@@ -3,7 +3,7 @@
 **Features:**
 * Create, read, update, and delete notes and folders.
 * Search notes.
-* Notes animate on changes.
+* Notes list items animate on changes.
 * Expand and collapse sidebar.
 * Data is persisted to local storage.
 
