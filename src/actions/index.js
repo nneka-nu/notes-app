@@ -20,7 +20,6 @@ import { SET_SELECTED_FOLDER_ID, setSelectedFolderId } from './selectedFolderId'
 import { SET_SELECTED_NOTE_ID, setSelectedNoteId } from './selectedNoteId';
 import { SET_CREATE_BUTTON_DISABLED, setCreateButtonDisabled } from './createButtonDisabled';
 import { SET_SHOULD_DELETE_NOTE, setShouldDeleteNote } from './shouldDeleteNote';
-import { SET_LAST_COMPONENT_HAS_MOUNTED, setLastComponentHasMounted } from './lastComponentHasMounted';
 import { SET_SEARCH_INFO, setSearchInfo } from './search';
 
 export const types = { 
@@ -35,7 +34,6 @@ export const types = {
   SET_SELECTED_FOLDER_ID,
   SET_SELECTED_NOTE_ID,
   SET_CREATE_BUTTON_DISABLED,
-  SET_LAST_COMPONENT_HAS_MOUNTED,
   SET_SEARCH_INFO,
 };
 
@@ -51,6 +49,5 @@ export const actions = {
   setSelectedFolderId,
   setSelectedNoteId,
   setCreateButtonDisabled,
-  setLastComponentHasMounted,
   setSearchInfo,
 };

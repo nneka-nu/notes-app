@@ -12,7 +12,6 @@ const FoldersList = ({
   folders, 
   notes,
   firstNoteByFolder, 
-  lastComponentHasMounted,
   selectedFolderId,
   selectedNoteId,
   search,
@@ -94,6 +93,10 @@ const FoldersList = ({
 
     const allFolderNames = folders.map(folder => folder.name.toLowerCase());
     if (!allFolderNames.includes(name.toLowerCase())) {
+      if (firstNoteByFolderRef.current && isNoteEmpty(firstNoteByFolderRef.current.noteAsText)) {
+        deleteNote(selectedNoteIdRef.current);
+      }
+
       const id = uuidv1();
       addFolder(id, name);
       setSelectedFolderId(id);
@@ -145,8 +148,7 @@ const FoldersList = ({
       <div className="folders-header">Folders</div>
       <div ref={foldersListElem} className="folders-list">
         <ul>
-          {/* prevents editor from taking focus from list item button */}
-          {lastComponentHasMounted && folders.map((folder) => (
+          {folders.map((folder) => (
             <FolderListItem 
               key={folder.id}
               folder={folder} 
@@ -185,7 +187,6 @@ const mapStateToProps = (state) => {
     selectedFolderId: state.selectedFolderId,
     notes: state.notes,
     firstNoteByFolder: notesByFolder[0],
-    lastComponentHasMounted: state.lastComponentHasMounted,
     search: state.search,
   };
 };

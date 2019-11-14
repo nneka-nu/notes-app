@@ -16,7 +16,6 @@ const SingleNote = ({
   deleteNote,
   setCreateButtonDisabled, 
   moveActiveNoteToTop, 
-  setLastComponentHasMounted,
   toolbarRef }) => {
   console.log('SingleNote render', note);
   const dateTimeRef = useRef();
@@ -148,10 +147,6 @@ const SingleNote = ({
     }
   }, [note, firstNote, updateNote, deleteNote, setCreateButtonDisabled, moveActiveNoteToTop, setSelectedNoteId]);
 
-  useEffect(() => {
-    setLastComponentHasMounted(true);
-  }, [setLastComponentHasMounted]);
-
   return (
     <section className="single-note">
       {showDateTime && <div className="datetime">{dateTimeRef.current}</div>}
@@ -184,7 +179,6 @@ const mapDispatchToProps = {
   updateNote: actions.updateNote,
   setCreateButtonDisabled: actions.setCreateButtonDisabled,
   moveActiveNoteToTop: actions.moveActiveNoteToTop,
-  setLastComponentHasMounted: actions.setLastComponentHasMounted,
   setSelectedNoteId: actions.setSelectedNoteId,
   deleteNote: actions.deleteNote,
 };
