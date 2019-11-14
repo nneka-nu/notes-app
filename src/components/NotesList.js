@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { connect } from'react-redux';
+import { Flipper } from 'react-flip-toolkit';
 import { actions } from '../actions';
 import { getNotesByFolder, getNotesBySearch } from '../selectors';
 import { isNoteEmpty } from '../utils';
@@ -19,12 +20,12 @@ const NotesList = ({
   deleteNote, 
   setShouldDeleteNote,
   toggleFolder }) => {
-  console.log('NotesList render');
   const selectedRef = useRef();
   const selectedFolderIdRef = useRef();
   const selectedNoteIdRef = useRef();
   const allNotesRef = useRef(); // no search/folder filter
   const notesRef = useRef();
+  const flipKey = notes.map(note => note.lastUpdated).join('');
 
   const handleItemClick = useCallback((note) => {
     const selected = selectedRef.current;
@@ -113,23 +114,25 @@ const NotesList = ({
 
   return (
     <section className={'notes-list ' + (toggleFolder ? '' : 'folders-hidden')}>
-      <ul>
-      {notes.map((note) => {
-        const folder = folders.filter(folder => folder.id === note.folderId);
-        const folderName = folder.length > 0 ? folder[0].name : '';
-        return (
-          <NoteListItemWrapper 
-            key={note.id}
-            isSelected={selectedNoteId === note.id}
-            selectedFolderId={selectedFolderId}
-            folderName={folderName}
-            searchTerm={search.term}
-            note={note}
-            onClick={handleItemClick}
-          />
-        )
-      })}
-      </ul>
+      <Flipper flipKey={flipKey}>
+        <ul>
+        {notes.map((note) => {
+          const folder = folders.filter(folder => folder.id === note.folderId);
+          const folderName = folder.length > 0 ? folder[0].name : '';
+          return (
+            <NoteListItemWrapper 
+              key={note.id}
+              isSelected={selectedNoteId === note.id}
+              selectedFolderId={selectedFolderId}
+              folderName={folderName}
+              searchTerm={search.term}
+              note={note}
+              onClick={handleItemClick}
+            />
+          )
+        })}
+        </ul>
+      </Flipper>
     </section>
   );
 };

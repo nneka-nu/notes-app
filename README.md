@@ -1,3 +1,12 @@
+**Installation**: Run npm install, then npm start.
+**Features:**
+* Create, read, update, and delete notes and folders.
+* Search notes.
+* Notes animate on changes.
+* Expand and collapse sidebar.
+* Data is persisted to local storage.
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

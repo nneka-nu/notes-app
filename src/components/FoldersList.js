@@ -23,7 +23,6 @@ const FoldersList = ({
   addFolder, 
   deleteFolder,
   setSearchInfo }) => {
-  console.log('FoldersList render', selectedFolderId);
   const foldersListElem = useRef();
   const notesRef = useRef();
   const foldersRef = useRef();

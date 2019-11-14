@@ -10,7 +10,6 @@ const NoteListItemWrapper = ({
   selectedFolderId,
   searchTerm,
   onClick }) => {
-  console.log('NoteListItemWrapper render', note.id)
   let dateOrTime = '';
   const emptyNote = isNoteEmpty(note.noteAsText);
   let firstLine = '';
@@ -65,16 +64,17 @@ const NoteListItemWrapper = ({
   }
 
   return (
-    <NoteListItem 
-      title={title} 
-      subtitle={subtitle} 
-      dateOrTime={dateOrTime} 
-      isSelected={isSelected}
-      selectedFolderId={selectedFolderId}
-      folderName={folderName}
-      searchTerm={searchTerm}
-      onClick={() => onClick(note)}
-    />
+      <NoteListItem 
+        noteId={note.id}
+        title={title} 
+        subtitle={subtitle} 
+        dateOrTime={dateOrTime} 
+        isSelected={isSelected}
+        selectedFolderId={selectedFolderId}
+        folderName={folderName}
+        searchTerm={searchTerm}
+        onClick={() => onClick(note)}
+      />
   );
 };
 

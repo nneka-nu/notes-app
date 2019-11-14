@@ -17,7 +17,6 @@ const SingleNote = ({
   setCreateButtonDisabled, 
   moveActiveNoteToTop, 
   toolbarRef }) => {
-  console.log('SingleNote render', note);
   const dateTimeRef = useRef();
   const editorRef = useRef(null);
   const quillInstance = useRef(null);

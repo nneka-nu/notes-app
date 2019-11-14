@@ -7,7 +7,6 @@ import NotesList from './NotesList';
 import SingleNote from './SingleNote';
 
 const App = () => {
-  console.log('App render');
   const [toggleFolder, setToggleFolder] = useState(true);
   const [toolbarRefHasValue, setToolbarRefHasValue] = useState(false);
   const toolbarRef = React.useRef();

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { TiFolder } from 'react-icons/ti';
+import { Flipped } from 'react-flip-toolkit';
 
 const NoteListItem = ({ 
+  noteId,
   title, 
   subtitle, 
   dateOrTime, 
@@ -84,40 +86,42 @@ const NoteListItem = ({
   };
 
   return (
-    <li 
-      className={isSelected ? className : ''}
-      onClick={handleItemClick}
-      onBlur={handleItemBlur}
-      tabIndex="-1"
-      >
-      {(!searchTerm || showTitle) && <div className="title">{title}</div>}
-      {searchTerm && !showTitle &&
-        <div className="title">{titles.titleLeft} 
-          <span className="search-term">
-            {titles.titleMiddle}
-          </span>
-          {titles.titleRight}
-        </div>
-      }
-      <div className="subtitle">
-        <span className="last-updated">{dateOrTime}</span> 
-        {!searchTerm && <span className="text">{subtitle}</span>}
-        {searchTerm && 
-          <span className="text">{titles.subtitleLeft} 
+    <Flipped key={noteId} flipId={noteId}>
+      <li 
+        className={isSelected ? className : ''}
+        onClick={handleItemClick}
+        onBlur={handleItemBlur}
+        tabIndex="-1"
+        >
+        {(!searchTerm || showTitle) && <div className="title">{title}</div>}
+        {searchTerm && !showTitle &&
+          <div className="title">{titles.titleLeft} 
             <span className="search-term">
-              {titles.subtitleMiddle}
+              {titles.titleMiddle}
             </span>
-            {titles.subtitleRight}
-          </span>
+            {titles.titleRight}
+          </div>
         }
-      </div>
-      {searchTerm && 
-        <div className="folder-name">
-          <div className="icon"><TiFolder /></div>
-          <span>{folderName}</span>
+        <div className="subtitle">
+          <span className="last-updated">{dateOrTime}</span> 
+          {!searchTerm && <span className="text">{subtitle}</span>}
+          {searchTerm && 
+            <span className="text">{titles.subtitleLeft} 
+              <span className="search-term">
+                {titles.subtitleMiddle}
+              </span>
+              {titles.subtitleRight}
+            </span>
+          }
         </div>
-      }
-    </li>
+        {searchTerm && 
+          <div className="folder-name">
+            <div className="icon"><TiFolder /></div>
+            <span>{folderName}</span>
+          </div>
+        }
+      </li>
+    </Flipped>
   );
 };
 

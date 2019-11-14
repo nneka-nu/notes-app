@@ -9,7 +9,6 @@ import { getNotesByFolder, getNotesBySearch } from '../selectors';
 import { isNoteEmpty } from '../utils';
 
 const Toolbar = forwardRef((props, ref) => {
-  console.log('Toolbar render')
   const { 
     selectedFolderId,
     createButtonDisabled,
