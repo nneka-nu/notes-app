@@ -4,13 +4,14 @@ import uuidv1 from 'uuid/v1';
 import './css/index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import throttle from 'lodash.throttle';
 import moment from 'moment';
 import reducers from './reducers';
+import { updateNoteScheduler } from './middleware';
 import { getSavedState, setSavedState } from './localStorage';
-import throttle from 'lodash.throttle';
 
 const folderId = uuidv1();
 const noteId = uuidv1();
@@ -37,7 +38,9 @@ const savedState = getSavedState();
 const store = createStore(
   reducers, 
   savedState || initialState, 
-  composeWithDevTools()
+  composeWithDevTools(
+    applyMiddleware(updateNoteScheduler),
+  )
 );
 
 store.subscribe(throttle(() => {
