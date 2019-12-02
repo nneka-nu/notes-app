@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import uuidv1 from 'uuid/v1';
 import { AiFillPlusCircle } from 'react-icons/ai';
@@ -7,6 +7,7 @@ import { actions } from '../actions';
 import { isNoteEmpty, isInputValid } from '../utils';
 import { getNotesByFolder } from '../selectors';
 import FolderListItem from './FolderListItem';
+import Modal from './Modal';
 
 const FoldersList = ({ 
   folders, 
@@ -30,6 +31,8 @@ const FoldersList = ({
   const selectedNoteIdRef = useRef();
   const selectedFolderIdRef = useRef();
   const searchRef = useRef();
+  const [showModal, setShowModal] = useState(false);
+  const folderToDelete = useRef({id: '', name: ''});
 
   useEffect(() => {
     notesRef.current = notes;
@@ -107,7 +110,12 @@ const FoldersList = ({
     }
   };
 
-  const handleDeleteFolder = useCallback((id) => {
+  const handleDeleteFolder = () => {
+    handleCloseModal();
+    const { id } = folderToDelete.current;
+
+    if (!id) { return; }
+
     setSearchInfo('', false);
     const allFolders = foldersRef.current;
     let folderIndex = allFolders.findIndex(folder => folder.id === id);
@@ -140,7 +148,17 @@ const FoldersList = ({
     notesAtFolderToDelete.forEach(note => {
       deleteNote(note.id);
     });
-  }, [deleteFolder, deleteNote, setSelectedFolderId, setSelectedNoteId, setCreateButtonDisabled, setSearchInfo]);
+  };
+
+  const handleShowModal = useCallback((id) => {
+    const folder = folders.filter(folder => folder.id === id);
+    folderToDelete.current = {id, name: folder[0].name};
+    setShowModal(true);
+  }, [folders]);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <section data-testid="folders-container" className={'folders ' + (toggleFolder ? '' : 'hidden')}>
@@ -153,7 +171,7 @@ const FoldersList = ({
               folder={folder} 
               selected={selectedFolderId === folder.id}
               onClick={handleFolderClick}
-              onDeleteFolder={handleDeleteFolder}
+              onDeleteFolder={handleShowModal}
             />
           ))}
         </ul>
@@ -173,6 +191,30 @@ const FoldersList = ({
           </button>
         </div>
       </div>
+      <Modal
+        title="Delete Folder"
+        show={showModal}
+        onHide={handleCloseModal}>
+        <div className="text">
+          Are you sure you want to delete this folder ({folderToDelete.current.name}) and its notes?
+        </div>
+        <div className="modal-buttons">
+          <button 
+            type="button" 
+            className="negative"
+            onClick={handleCloseModal}
+          >
+            No
+          </button>
+          <button
+            type="button"
+            className="positive"
+            onClick={handleDeleteFolder}
+          >
+            Yes
+          </button>
+        </div>
+      </Modal>
     </section>
   )
 };

@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import uuidv1 from 'uuid/v1';
 import moment from 'moment';
 import { GoListUnordered, GoListOrdered, GoTrashcan } from 'react-icons/go';
@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import { getNotesByFolder, getNotesBySearch } from '../selectors';
 import { isNoteEmpty } from '../utils';
+import Modal from './Modal';
 
 const Toolbar = forwardRef((props, ref) => {
   const { 
@@ -22,6 +23,7 @@ const Toolbar = forwardRef((props, ref) => {
     setShouldDeleteNote,
     setSearchInfo,
     deleteNote } = props;
+  const [showModal, setShowModal] = useState(false);
 
   const handleCreateNote = () => {
     setSearchInfo('', false);
@@ -44,10 +46,17 @@ const Toolbar = forwardRef((props, ref) => {
     onToggleFolder();
   };
 
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   const handleDeleteNote = () => {
-    if (window.confirm("Are you sure you want to delete this note?")) {
-      setShouldDeleteNote(true);
-    }
+    handleCloseModal();
+    setShouldDeleteNote(true);
   };
 
   const handleSearch = (e) => {
@@ -76,7 +85,7 @@ const Toolbar = forwardRef((props, ref) => {
           title="Delete note"
           className="trash-icon"
           disabled={!notesAvailable}
-          onClick={handleDeleteNote}
+          onClick={handleShowModal}
         >
           <GoTrashcan />
         </button>
@@ -129,6 +138,28 @@ const Toolbar = forwardRef((props, ref) => {
         value={search.term}
         onChange={handleSearch}
       />
+      <Modal
+        title="Delete Note"
+        show={showModal}
+        onHide={handleCloseModal}>
+        <div className="text">Are you sure you want to delete this note?</div>
+        <div className="modal-buttons">
+          <button 
+            type="button" 
+            className="negative"
+            onClick={handleCloseModal}
+          >
+            No
+          </button>
+          <button
+            type="button"
+            className="positive"
+            onClick={handleDeleteNote}
+          >
+            Yes
+          </button>
+        </div>
+      </Modal>
     </>
   );
 });

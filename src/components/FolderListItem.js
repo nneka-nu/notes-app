@@ -54,9 +54,7 @@ const FolderListItem = ({ folder, selected, onClick, renameFolder, onDeleteFolde
 
   const handleDeleteFolder = (e) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this folder and its notes?')) {
-      onDeleteFolder(folder.id)
-    }
+    onDeleteFolder(folder.id)
   }
 
   return (
