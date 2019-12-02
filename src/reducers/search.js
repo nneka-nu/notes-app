@@ -1,6 +1,6 @@
 import { types } from '../actions';
 
-const initialState ={
+const initialState = {
   term: '',
   isSearchComplete: false,
 }

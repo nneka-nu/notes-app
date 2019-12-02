@@ -115,22 +115,22 @@ const NotesList = ({
   return (
     <section className={'notes-list ' + (toggleFolder ? '' : 'folders-hidden')}>
       <Flipper flipKey={flipKey}>
-        <ul>
-        {notes.map((note) => {
-          const folder = folders.filter(folder => folder.id === note.folderId);
-          const folderName = folder.length > 0 ? folder[0].name : '';
-          return (
-            <NoteListItemWrapper 
-              key={note.id}
-              isSelected={selectedNoteId === note.id}
-              selectedFolderId={selectedFolderId}
-              folderName={folderName}
-              searchTerm={search.term}
-              note={note}
-              onClick={handleItemClick}
-            />
-          )
-        })}
+        <ul data-testid="list-of-notes">
+          {notes.map((note) => {
+            const folder = folders.filter(folder => folder.id === note.folderId);
+            const folderName = folder.length > 0 ? folder[0].name : '';
+            return (
+              <NoteListItemWrapper 
+                key={note.id}
+                isSelected={selectedNoteId === note.id}
+                selectedFolderId={selectedFolderId}
+                folderName={folderName}
+                searchTerm={search.term}
+                note={note}
+                onClick={handleItemClick}
+              />
+            )
+          })}
         </ul>
       </Flipper>
     </section>

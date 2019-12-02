@@ -66,8 +66,8 @@ const Toolbar = forwardRef((props, ref) => {
     <>
       <div id="quill-toolbar" ref={ref}>
         <button
-          className="columns-icon"
           title="Show/hide folders"
+          className="columns-icon"
           onClick={handleToggleFolder}
         >
           <FiColumns />
@@ -89,27 +89,32 @@ const Toolbar = forwardRef((props, ref) => {
           <FiEdit />
         </button>
         <button 
+          title="Bold"
           className="ql-bold" 
           disabled={!notesAvailable}>
             B
         </button>
         <button 
+          title="Italic"
           className="ql-italic" 
           disabled={!notesAvailable}>
             I
         </button>
         <button 
+          title="Underline"
           className="ql-underline" 
           disabled={!notesAvailable}>
             U
         </button>
         <button 
+          title="Numbered list"
           className="ql-list" 
           value="ordered" 
           disabled={!notesAvailable}>
           <GoListOrdered />
         </button>
         <button 
+          title="Bulleted list"
           className="ql-list" 
           value="bullet" 
           disabled={!notesAvailable}>
@@ -120,6 +125,7 @@ const Toolbar = forwardRef((props, ref) => {
         name="search"
         type="search"
         placeholder="Search"
+        aria-label="Search"
         value={search.term}
         onChange={handleSearch}
       />

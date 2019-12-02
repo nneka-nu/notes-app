@@ -143,7 +143,7 @@ const FoldersList = ({
   }, [deleteFolder, deleteNote, setSelectedFolderId, setSelectedNoteId, setCreateButtonDisabled, setSearchInfo]);
 
   return (
-    <section className={'folders ' + (toggleFolder ? '' : 'hidden')}>
+    <section data-testid="folders-container" className={'folders ' + (toggleFolder ? '' : 'hidden')}>
       <div className="folders-header">Folders</div>
       <div ref={foldersListElem} className="folders-list">
         <ul>

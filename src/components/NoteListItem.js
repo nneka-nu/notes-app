@@ -88,6 +88,7 @@ const NoteListItem = ({
   return (
     <Flipped key={noteId} flipId={noteId}>
       <li 
+        data-testid="note-list-item"
         className={isSelected ? className : ''}
         onClick={handleItemClick}
         onBlur={handleItemBlur}
