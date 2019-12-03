@@ -31,9 +31,21 @@ const FoldersList = ({
   const selectedNoteIdRef = useRef();
   const selectedFolderIdRef = useRef();
   const searchRef = useRef();
-  const [showModal, setShowModal] = useState(false);
+  const [showFolderDeleteModal, setShowFolderDeleteModal] = useState(false);
+  const [showFolderCreateModal, setShowFolderCreateModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const folderToDelete = useRef({id: '', name: ''});
+  const folderNameInputRef = useRef();
+  const modalToShow = useRef();
+  const FOLDER_CREATE = 'folder-create';
+  const FOLDER_DELETE = 'folder-delete';
 
+  useEffect(() => {
+    if (folderNameInputRef.current) {
+      folderNameInputRef.current.focus();
+    }
+  });
+  
   useEffect(() => {
     notesRef.current = notes;
     foldersRef.current = folders;
@@ -82,19 +94,23 @@ const FoldersList = ({
 
   const handleNewFolderClick = () => {
     setSearchInfo('', false);
-    let name = prompt("Enter folder name");
-    if (name === null) { // user hit cancel
-      return;
-    }
+    modalToShow.current = FOLDER_CREATE;
+    setShowFolderCreateModal(true);
+  };
 
+  const handleNewFolderCreate = () => {
+    let name = folderNameInputRef.current.value;
     name = name ? name.trim() : '';
     if (!name || !isInputValid(name)) {
-      alert('Invalid input. Only letters, numbers, spaces, underscores, and dashes are allowed.')
+      setErrorMessage('Invalid input. Only letters, numbers, spaces, underscores, and dashes are allowed.');
       return;
     }
 
     const allFolderNames = folders.map(folder => folder.name.toLowerCase());
+    name = name.split(' ').filter(item => item !== '').join(' '); // remove extra spaces between words
     if (!allFolderNames.includes(name.toLowerCase())) {
+      handleCloseModal(FOLDER_CREATE);
+
       if (firstNoteByFolderRef.current && isNoteEmpty(firstNoteByFolderRef.current.noteAsText)) {
         deleteNote(selectedNoteIdRef.current);
       }
@@ -106,12 +122,12 @@ const FoldersList = ({
       setCreateButtonDisabled(false);
       foldersListElem.current.scrollTop = foldersListElem.current.offsetHeight;
     } else {
-      alert('That folder name already exists.');
+      setErrorMessage('That folder already exists.');
     }
   };
 
   const handleDeleteFolder = () => {
-    handleCloseModal();
+    handleCloseModal(FOLDER_DELETE);
     const { id } = folderToDelete.current;
 
     if (!id) { return; }
@@ -150,14 +166,21 @@ const FoldersList = ({
     });
   };
 
-  const handleShowModal = useCallback((id) => {
+  const handleShowFolderDeleteModal = useCallback((id) => {
     const folder = folders.filter(folder => folder.id === id);
     folderToDelete.current = {id, name: folder[0].name};
-    setShowModal(true);
+    setShowFolderDeleteModal(true);
+    modalToShow.current = FOLDER_DELETE;
   }, [folders]);
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const handleCloseModal = (type) => {
+    setErrorMessage('');
+    if (type === FOLDER_DELETE) {
+      setShowFolderDeleteModal(false);  
+    } else {
+      setShowFolderCreateModal(false);
+      folderNameInputRef.current.value = '';
+    }
   };
 
   return (
@@ -171,7 +194,7 @@ const FoldersList = ({
               folder={folder} 
               selected={selectedFolderId === folder.id}
               onClick={handleFolderClick}
-              onDeleteFolder={handleShowModal}
+              onDeleteFolder={handleShowFolderDeleteModal}
             />
           ))}
         </ul>
@@ -191,32 +214,61 @@ const FoldersList = ({
           </button>
         </div>
       </div>
-      <Modal
-        title="Delete Folder"
-        show={showModal}
-        onHide={handleCloseModal}>
-        <div className="text">
-          Are you sure you want to delete this folder ({folderToDelete.current.name}) and its notes?
-        </div>
-        <div className="modal-buttons">
-          <button 
-            type="button" 
-            className="negative"
-            onClick={handleCloseModal}
-          >
-            No
-          </button>
-          <button
-            type="button"
-            className="positive"
-            onClick={handleDeleteFolder}
-          >
-            Yes
-          </button>
-        </div>
-      </Modal>
+      {modalToShow.current === FOLDER_DELETE && 
+        <Modal
+          title="Delete Folder"
+          show={showFolderDeleteModal}
+          onHide={() => handleCloseModal(FOLDER_DELETE)}>
+          <div className="text">
+            Are you sure you want to delete this folder ({folderToDelete.current.name}) and its notes?
+          </div>
+          <div className="modal-buttons">
+            <button 
+              type="button" 
+              className="negative"
+              onClick={() => handleCloseModal(FOLDER_DELETE)}
+            >
+              No
+            </button>
+            <button
+              type="button"
+              className="positive"
+              onClick={handleDeleteFolder}
+            >
+              Yes
+            </button>
+          </div>
+        </Modal>  
+      }
+      {modalToShow.current === FOLDER_CREATE && 
+        <Modal
+          title="Create New Folder"
+          show={showFolderCreateModal}
+          onHide={() => handleCloseModal(FOLDER_CREATE)}>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <input ref={folderNameInputRef} type="text" />
+            <span className="error">{errorMessage}</span>
+            <div className="modal-buttons">
+              <button 
+                type="button" 
+                className="negative"
+                onClick={() => handleCloseModal(FOLDER_CREATE)}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="positive"
+                onClick={handleNewFolderCreate}
+              >
+                Save
+              </button>
+            </div>  
+          </form>
+        </Modal>
+        }   
     </section>
-  )
+  );
 };
 
 const mapStateToProps = (state) => {
