@@ -1,11 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { connect } from 'react-redux';
 import { GoTrashcan } from 'react-icons/go';
 import { FiEdit2 } from 'react-icons/fi';
-import { actions } from '../actions';
-import { isInputValid } from '../utils';
 
-const FolderListItem = ({ folder, selected, onClick, renameFolder, onDeleteFolder }) => {
+const FolderListItem = ({ folder, selected, onClick, onDeleteFolder, onRenameFolder }) => {
   const [className, setClassname] = useState('')
   const buttonRef = useRef();
   const selectedRef = useRef();
@@ -34,22 +31,7 @@ const FolderListItem = ({ folder, selected, onClick, renameFolder, onDeleteFolde
 
   const handleEditFolder = (e) => {
     e.stopPropagation();
-    let name = prompt('Enter a new name.', folder.name);
-    if (name === null) { // user canceled prompt.
-      return; 
-    }
-
-    name = name.trim();
-    if (!name || !isInputValid(name)) {
-      alert('Invalid input. Only letters, numbers, spaces, underscores, and dashes are allowed.')
-      return;
-    }
-
-    if (folder.name === name) {
-      return;
-    }
-
-    renameFolder(folder.id, name);
+    onRenameFolder(folder.id, folder.name);
   }
 
   const handleDeleteFolder = (e) => {
@@ -86,8 +68,4 @@ const FolderListItem = ({ folder, selected, onClick, renameFolder, onDeleteFolde
   );
 };
 
-const mapDispatchToProps = {
-  renameFolder: actions.renameFolder,
-}
-
-export default connect(null, mapDispatchToProps)(FolderListItem);
+export default FolderListItem;

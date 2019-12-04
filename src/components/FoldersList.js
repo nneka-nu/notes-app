@@ -23,7 +23,8 @@ const FoldersList = ({
   deleteNote,
   addFolder, 
   deleteFolder,
-  setSearchInfo }) => {
+  setSearchInfo,
+  renameFolder }) => {
   const foldersListElem = useRef();
   const notesRef = useRef();
   const foldersRef = useRef();
@@ -32,13 +33,15 @@ const FoldersList = ({
   const selectedFolderIdRef = useRef();
   const searchRef = useRef();
   const [showFolderDeleteModal, setShowFolderDeleteModal] = useState(false);
-  const [showFolderCreateModal, setShowFolderCreateModal] = useState(false);
+  const [showFolderCreateOrRenameModal, setShowFolderCreateOrRenameModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const folderToDelete = useRef({id: '', name: ''});
+  const folderToRename = useRef({id: '', name: ''});
   const folderNameInputRef = useRef();
   const modalToShow = useRef();
   const FOLDER_CREATE = 'folder-create';
   const FOLDER_DELETE = 'folder-delete';
+  const FOLDER_RENAME = 'folder-rename';
 
   useEffect(() => {
     if (folderNameInputRef.current) {
@@ -95,21 +98,28 @@ const FoldersList = ({
   const handleNewFolderClick = () => {
     setSearchInfo('', false);
     modalToShow.current = FOLDER_CREATE;
-    setShowFolderCreateModal(true);
+    setShowFolderCreateOrRenameModal(true);
   };
 
-  const handleNewFolderCreate = () => {
+  const handleNewFolderCreateOrRename = () => {
     let name = folderNameInputRef.current.value;
     name = name ? name.trim() : '';
     if (!name || !isInputValid(name)) {
-      setErrorMessage('Invalid input. Only letters, numbers, spaces, underscores, and dashes are allowed.');
+      setErrorMessage(`Invalid input. Only letters, numbers, spaces, 
+        underscores, and dashes are allowed.`);
       return;
     }
+    
+    name = name.split(' ').filter(item => item !== '').join(' '); // remove extra spaces between words
 
     const allFolderNames = folders.map(folder => folder.name.toLowerCase());
-    name = name.split(' ').filter(item => item !== '').join(' '); // remove extra spaces between words
     if (!allFolderNames.includes(name.toLowerCase())) {
-      handleCloseModal(FOLDER_CREATE);
+      handleCloseModal();
+
+      if (modalToShow.current === FOLDER_RENAME) {
+        renameFolder(folderToRename.current.id, name);
+        return;
+      }
 
       if (firstNoteByFolderRef.current && isNoteEmpty(firstNoteByFolderRef.current.noteAsText)) {
         deleteNote(selectedNoteIdRef.current);
@@ -121,9 +131,16 @@ const FoldersList = ({
       setSelectedNoteId('');
       setCreateButtonDisabled(false);
       foldersListElem.current.scrollTop = foldersListElem.current.offsetHeight;
-    } else {
-      setErrorMessage('That folder already exists.');
+      return;
     }
+
+    if (modalToShow.current === FOLDER_RENAME &&
+      name.toLowerCase() === folderToRename.current.name.toLowerCase()) {
+      handleCloseModal();
+      return;
+    }
+
+    setErrorMessage('That folder already exists.');
   };
 
   const handleDeleteFolder = () => {
@@ -167,18 +184,29 @@ const FoldersList = ({
   };
 
   const handleShowFolderDeleteModal = useCallback((id) => {
+    setSearchInfo('', false);
     const folder = folders.filter(folder => folder.id === id);
     folderToDelete.current = {id, name: folder[0].name};
     setShowFolderDeleteModal(true);
     modalToShow.current = FOLDER_DELETE;
-  }, [folders]);
+  }, [folders, setSearchInfo]);
 
-  const handleCloseModal = (type) => {
+  const handleShowFolderRenameModal = useCallback((id, name) => {
+    setSearchInfo('', false);
+    folderToRename.current = {id, name};
+    if (folderNameInputRef.current) {
+      folderNameInputRef.current.value = name;
+    }
+    modalToShow.current = FOLDER_RENAME;
+    setShowFolderCreateOrRenameModal(true);
+  }, [setSearchInfo]);
+
+  const handleCloseModal = (type = 'folder-create-rename') => {
     setErrorMessage('');
     if (type === FOLDER_DELETE) {
       setShowFolderDeleteModal(false);  
     } else {
-      setShowFolderCreateModal(false);
+      setShowFolderCreateOrRenameModal(false);
       folderNameInputRef.current.value = '';
     }
   };
@@ -195,6 +223,7 @@ const FoldersList = ({
               selected={selectedFolderId === folder.id}
               onClick={handleFolderClick}
               onDeleteFolder={handleShowFolderDeleteModal}
+              onRenameFolder={handleShowFolderRenameModal}
             />
           ))}
         </ul>
@@ -220,7 +249,8 @@ const FoldersList = ({
           show={showFolderDeleteModal}
           onHide={() => handleCloseModal(FOLDER_DELETE)}>
           <div className="text">
-            Are you sure you want to delete this folder ({folderToDelete.current.name}) and its notes?
+            Are you sure you want to delete this folder 
+            ({folderToDelete.current.name}) and its notes?
           </div>
           <div className="modal-buttons">
             <button 
@@ -240,26 +270,30 @@ const FoldersList = ({
           </div>
         </Modal>  
       }
-      {modalToShow.current === FOLDER_CREATE && 
+      {(modalToShow.current === FOLDER_CREATE || modalToShow.current === FOLDER_RENAME) && 
         <Modal
-          title="Create New Folder"
-          show={showFolderCreateModal}
-          onHide={() => handleCloseModal(FOLDER_CREATE)}>
+          title={modalToShow.current === FOLDER_CREATE ? "Create New Folder" : "Rename Folder"}
+          show={showFolderCreateOrRenameModal}
+          onHide={handleCloseModal}>
           <form onSubmit={(e) => e.preventDefault()}>
-            <input ref={folderNameInputRef} type="text" />
+            <input 
+              ref={folderNameInputRef} 
+              type="text"
+              defaultValue={modalToShow.current === FOLDER_CREATE ? '' : folderToRename.current.name}
+            />
             <span className="error">{errorMessage}</span>
             <div className="modal-buttons">
               <button 
                 type="button" 
                 className="negative"
-                onClick={() => handleCloseModal(FOLDER_CREATE)}
+                onClick={handleCloseModal}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className="positive"
-                onClick={handleNewFolderCreate}
+                onClick={handleNewFolderCreateOrRename}
               >
                 Save
               </button>
@@ -292,6 +326,7 @@ const mapDispatchToProps = {
   addFolder: actions.addFolder,
   deleteFolder: actions.deleteFolder,
   setSearchInfo: actions.setSearchInfo,
+  renameFolder: actions.renameFolder,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(FoldersList);
