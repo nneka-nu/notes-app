@@ -215,7 +215,7 @@ const FoldersList = ({
     <section data-testid="folders-container" className={'folders ' + (toggleFolder ? '' : 'hidden')}>
       <div className="folders-header">Folders</div>
       <div ref={foldersListElem} className="folders-list">
-        <ul>
+        <ul data-testid="folders-list">
           {folders.map((folder) => (
             <FolderListItem 
               key={folder.id}
@@ -231,6 +231,7 @@ const FoldersList = ({
       <div className="folders-footer">
         <div className="new">
           <button 
+            data-testid="New folder"
             type="button"
             onClick={handleNewFolderClick}
           >
@@ -261,6 +262,7 @@ const FoldersList = ({
               No
             </button>
             <button
+              title="Delete this folder"
               type="button"
               className="positive"
               onClick={handleDeleteFolder}
@@ -279,6 +281,7 @@ const FoldersList = ({
             <input 
               ref={folderNameInputRef} 
               type="text"
+              aria-label="Folder Name"
               defaultValue={modalToShow.current === FOLDER_CREATE ? '' : folderToRename.current.name}
             />
             <span className="error">{errorMessage}</span>
@@ -291,6 +294,7 @@ const FoldersList = ({
                 Cancel
               </button>
               <button
+                title={modalToShow.current === FOLDER_CREATE ? 'Create new folder' : 'Rename this folder'}
                 type="submit"
                 className="positive"
                 onClick={handleNewFolderCreateOrRename}

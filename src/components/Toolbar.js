@@ -152,6 +152,7 @@ const Toolbar = forwardRef((props, ref) => {
             No
           </button>
           <button
+            title="Delete selected note"
             type="button"
             className="positive"
             onClick={handleDeleteNote}

@@ -22,7 +22,7 @@ const App = () => {
   };
 
   return (
-    <main>
+    <main data-testid="app-wrapper">
       <header className="toolbar">
         <Toolbar 
           ref={toolbarRef}

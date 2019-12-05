@@ -51,12 +51,14 @@ const FolderListItem = ({ folder, selected, onClick, onDeleteFolder, onRenameFol
         <div className="name">{folder.name}</div>
         <div className="editing">
           <div 
+            title="Rename folder"
             className="edit"
             onClick={handleEditFolder}
           >
             <FiEdit2 />
           </div>
           <div 
+            title="Delete folder"
             className="delete"
             onClick={handleDeleteFolder}
           >

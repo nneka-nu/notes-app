@@ -101,3 +101,51 @@ it('filters notes based on user input', () => {
   expect(element).toHaveTextContent('research');
   expect(element).not.toHaveTextContent('note-taking');
 });
+
+it('shows the correct modal on delete note button click', () => {
+  const { getByTestId, getByTitle }  = renderWithRedux(
+    <App />, 
+    {
+      folders: [{id: 1, name: 'Notes'}],
+      notes: [
+        {
+          id: 1, 
+          noteAsText: 'research',
+          folderId: 1, 
+        }
+      ],
+      selectedFolderId: 1,
+      selectedNoteId: 1,
+    }
+  );
+
+  fireEvent.click(getByTitle('Delete note'));
+  const appWrapper = getByTestId('app-wrapper');
+  const modal = getByTestId('modal-wrapper');
+  expect(appWrapper).toContainElement(modal);
+  expect(getByTestId('modal-title')).toHaveTextContent('Delete Note');
+});
+
+it('deletes notes', () => {
+  const { getByTestId, getByTitle }  = renderWithRedux(
+    <App />, 
+    {
+      folders: [{id: 1, name: 'Notes'}],
+      notes: [
+        {
+          id: 1, 
+          noteAsText: 'research',
+          folderId: 1, 
+        }
+      ],
+      selectedFolderId: 1,
+      selectedNoteId: 1,
+    }
+  );
+
+  const appWrapper = getByTestId('app-wrapper');
+  expect(appWrapper).toContainHTML('research');
+  fireEvent.click(getByTitle('Delete note'));
+  fireEvent.click(getByTitle('Delete selected note'));
+  expect(appWrapper).not.toContainHTML('research');
+});
